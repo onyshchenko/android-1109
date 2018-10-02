@@ -22,26 +22,35 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         student = new Student();
 
-        //student.firstName = "Ivan";
+        //student.firstName = null;
+        //student.lastName = null;
+        //student.age = null;
 
         textview_firsname = findViewById(R.id.textview_firsname);
         textview_lastname = findViewById(R.id.textview_lastname);
         textview_age = findViewById(R.id.textview_age);
-
+/*
         textview_firsname.setText(student.firstName != null ? String.format("%s", student.firstName) : String.format("%s", ""));
         textview_lastname.setText(student.lastName != null ? String.format("%s", student.lastName) : String.format("%s", ""));
         textview_age.setText(student.age > 0 ? String.format("%d", student.age) : null);
+*/
+
+        textview_firsname.setText(student.firstName);
+        textview_lastname.setText(student.lastName);
+       /* textview_age.setText(student.age);
+  */
     }
 
-
+/*
     @Override
     protected void onResume() {
         super.onResume();
+
         textview_firsname.setText(student.firstName != null ? String.format("%s", student.firstName) : String.format("%s", ""));
         textview_lastname.setText(student.lastName != null ? String.format("%s", student.lastName) : String.format("%s", ""));
         textview_age.setText(student.age > 0 ? String.format("%d", student.age) : null);
     }
-
+*/
     public void clck(View v) {
         switch (v.getId()){
             case R.id.button_view: {
@@ -71,10 +80,14 @@ public class MainActivity extends AppCompatActivity {
 
                 if (data.getExtras() != null) {
                     student = data.getParcelableExtra(EXTRA_STUDENT);
-
+/*
                     textview_firsname.setText(student.firstName != null ? String.format("%s", student.firstName) : String.format("%s", ""));
                     textview_lastname.setText(student.lastName != null ? String.format("%s", student.lastName) : String.format("%s", ""));
                     textview_age.setText(student.age > 0 ? String.format("%d", student.age) : null);
+*/
+                    textview_firsname.setText(student.firstName);
+                    textview_lastname.setText(student.lastName);
+                    textview_age.setText(student.age);
 
                 }
 
