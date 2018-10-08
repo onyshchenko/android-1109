@@ -1,6 +1,5 @@
-package com.example.onyshchenkov.android4;
+package com.example.onyshchenkov.android5;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,26 +11,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
+
     public void OnClck(View v) {
 
         switch (v.getId()){
             case R.id.button: {
-                startActivity( new Intent(this, Activity2.class));
-
+                //startActivity( new Intent(this, Activity2.class));
             }
-                break;
-            case R.id.button22: {
-                startActivity( new Intent(this, Activity3.class));
+            break;
+            case R.id.button2: {
+                //startActivity( new Intent(this, Activity3.class));
             }
-                break;
+            break;
             case R.id.button3: {
-                startActivity( new Intent(this, Activity4.class));
+                //startActivity( new Intent(this, Activity4.class));
             }
-                break;
+            break;
             case R.id.button4: {
-                startActivity( new Intent(this, Activity5.class));
+                //startActivity( new Intent(this, Activity5.class));
             }
-                break;
+            break;
             case R.id.button5:
                 break;
             case R.id.button6:
@@ -47,5 +46,4 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
 }
