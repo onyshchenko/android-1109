@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.onyshchenkov.android5">
+    package="com.example.onyshchenkov.homework_lesson9">
 
     <application
         android:allowBackup="true"
@@ -16,10 +16,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activity2" />
-        <activity android:name=".Activity3" />
-        <activity android:name=".Activity4" />
-        <activity android:name=".Activity5"></activity>
     </application>
 
 </manifest>

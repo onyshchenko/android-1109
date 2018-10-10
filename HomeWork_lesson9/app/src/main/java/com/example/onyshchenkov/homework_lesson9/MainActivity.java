@@ -1,55 +1,25 @@
-package com.example.onyshchenkov.homework_lesson8;
+package com.example.onyshchenkov.homework_lesson9;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private ListView mListView;
-    public static final String EXTRA_STUDENT = "com.example.onyshchenkov.homework_lesson8.student";
-    //public Student mStudent;
-
-    private ArrayList<Student> mStudents;
-    private StudentArrayAdapter madapter;
 
     private int mposition;
+    public static final String EXTRA_STUDENT = "com.example.onyshchenkov.homework_lesson9.student";
+    public static final String EXTRA_GROUP = "com.example.onyshchenkov.homework_lesson9.group";
+    private ArrayList<Student> mStudents;
+    private ArrayList<Group> mSroups;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mListView = findViewById(R.id.listview);
-        mListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
-
-
-        mStudents = new ArrayList<>();
-
-        madapter = new StudentArrayAdapter(
-                this,
-                R.layout.student,
-                mStudents
-        );
-        mListView.setAdapter(madapter);
-        //mListView.setItemsCanFocus(true);
-/*
-        mListView.setOnItemClickListener( new AdapterView.OnItemClickListener () {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d("onItemClick", "mposition " + position);
-                //Toast.makeText(MainActivity.this, String.valueOf(position), Toast.LENGTH_LONG).show();
-            }
-        });
-        */
     }
 
     public void OnClck(View v) {
@@ -102,7 +72,11 @@ public class MainActivity extends AppCompatActivity {
 
                 if (data.getExtras() != null) {
                     Student student = data.getParcelableExtra(EXTRA_STUDENT);
+                    int group = data.getParcelableExtra(EXTRA_GROUP);
                     mStudents.add(student);
+                    Group group = new Group("Group " + i, students);
+
+                    mSroups.add(group,student);
                     madapter.notifyDataSetChanged();
 
 
