@@ -3,6 +3,7 @@ package com.example.onyshchenkov.homework_lesson9;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -45,9 +46,12 @@ public class Activity2 extends AppCompatActivity {
                 student.age = Integer.parseInt(editText_age.getText().toString());
                 //student.age = 15;
 
+                //Log.d("Activity2", "editText_group " + ((EditText)findViewById(R.id.editText_group)).getText().toString());
+
+
                 Intent intent = new Intent();
                 intent.putExtra(MainActivity.EXTRA_STUDENT, student);
-                intent.putExtra(MainActivity.EXTRA_GROUP, Integer.parseInt(((EditText)findViewById(R.id.editText_group)).getText().toString()));
+                intent.putExtra(MainActivity.EXTRA_GROUP, ((EditText)findViewById(R.id.editText_group)).getText().toString());
                 setResult(RESULT_OK, intent);
                 finish();
             }

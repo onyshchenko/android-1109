@@ -2,6 +2,7 @@ package com.example.onyshchenkov.android5;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ExpandableListView;
 
@@ -37,6 +38,7 @@ public class Activity4 extends AppCompatActivity {
         mListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                Log.d("onGroupClick", "groupPosition: " + groupPosition);
                 return false;
             }
         });
@@ -44,7 +46,8 @@ public class Activity4 extends AppCompatActivity {
         mListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                return false;
+                Log.d("onChildClick", "groupPosition: " + groupPosition + ", childPosition: " + childPosition);
+                return true;
             }
         });
 

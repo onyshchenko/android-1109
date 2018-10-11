@@ -1,4 +1,4 @@
-package com.example.onyshchenkov.homework_lesson8;
+package com.example.onyshchenkov.android5;
 
 import android.os.Parcel;
 import android.os.Parcelable;
