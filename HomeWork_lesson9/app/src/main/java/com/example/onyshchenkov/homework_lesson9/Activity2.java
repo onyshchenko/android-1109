@@ -51,7 +51,7 @@ public class Activity2 extends AppCompatActivity {
 
                 Intent intent = new Intent();
                 intent.putExtra(MainActivity.EXTRA_STUDENT, student);
-                intent.putExtra(MainActivity.EXTRA_GROUP, ((EditText)findViewById(R.id.editText_group)).getText().toString());
+                intent.putExtra(MainActivity.EXTRA_GROUP, Integer.valueOf(((EditText)findViewById(R.id.editText_group)).getText().toString()));
                 setResult(RESULT_OK, intent);
                 finish();
             }

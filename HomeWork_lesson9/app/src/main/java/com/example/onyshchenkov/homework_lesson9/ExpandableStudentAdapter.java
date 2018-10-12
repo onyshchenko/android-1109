@@ -37,26 +37,26 @@ public class ExpandableStudentAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getGroupCount() {
-        Log.d("StudentAdapter", "getGroupCount " + mGroups.size());
+        //Log.d("StudentAdapter", "getGroupCount " + mGroups.size());
         return mGroups.size();
     }
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        Log.d("StudentAdapter", "getChildrenCount " + mGroups.get(groupPosition).students.size());
+        //Log.d("StudentAdapter", "getChildrenCount " + mGroups.get(groupPosition).students.size());
         return mGroups.get(groupPosition).students.size();
     }
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        Log.d("StudentAdapter", "getChild " + mGroups.get(groupPosition).students.get(childPosition));
+        //Log.d("StudentAdapter", "getChild " + mGroups.get(groupPosition).students.get(childPosition));
         return mGroups.get(groupPosition).students.get(childPosition);
     }
 
 
     @Override
     public Object getGroup(int groupPosition) {
-        Log.d("StudentAdapter", "getGroup " + mGroups.get(groupPosition));
+       // Log.d("StudentAdapter", "getGroup " + mGroups.get(groupPosition));
         return mGroups.get(groupPosition);
     }
 
@@ -65,7 +65,7 @@ public class ExpandableStudentAdapter extends BaseExpandableListAdapter {
         convertView = minflater.inflate(mGroupResource, null);
 
         Group group = (Group) getGroup(groupPosition);
-        ((TextView)convertView.findViewById(R.id.textViewGroupName)).setText(group.number);
+        ((TextView)convertView.findViewById(R.id.textViewGroupName)).setText(String.valueOf(group.number));
 
         /*
 

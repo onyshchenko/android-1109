@@ -36,35 +36,45 @@ public class MainActivity extends AppCompatActivity {
         //mposition = -1;
         switch (v.getId()) {
             case R.id.button: {
+                // ADD
                 startActivityForResult(new Intent(this, Activity2.class), 1);
             }
             break;
             case R.id.button2: {
-                //mposition = mListView.getCheckedItemPosition();
-                //mposition = madapter.getclckItemPosition();
-                //Log.d("OnClck", "mposition " + mposition);
-                mAdapter.getChild(mAdapter.getGroupPosition(), mAdapter.getChildPosition());
+                // EDIT
+                //mAdapter.getChild(mAdapter.getGroupPosition(), mAdapter.getChildPosition());
+                Group group = mGroups.get(mAdapter.getGroupPosition());
+                ArrayList<Student> Students = group.students;
+
+
                 //Toast.makeText(MainActivity.this, String.valueOf(mposition), Toast.LENGTH_LONG).show();
                 //if (mposition >= 0 && mStudents.size() > mposition) {
 
-                    //Intent intent = new Intent(this, Activity3.class);
-                    //intent.putExtra(EXTRA_STUDENT, mStudents.get(mposition));
-                    //startActivityForResult(intent, 2);
+                Intent intent = new Intent(this, Activity3.class);
+                intent.putExtra(EXTRA_STUDENT, Students.get(mAdapter.getChildPosition()));
+                intent.putExtra(EXTRA_GROUP, group.number);
+                startActivityForResult(intent, 2);
                 //}
 
-               // Log.d("Students", "Students size: " + mStudents.size());
+                // Log.d("Students", "Students size: " + mStudents.size());
             }
             break;
             case R.id.button3: {
-                //mposition = mListView.getCheckedItemPosition();
-                //mposition = madapter.getclckItemPosition();
-                //Log.d("OnClck", "mposition " + mposition);
-                //if (mposition >= 0 && mStudents.size() > mposition) {
-                    //Toast.makeText(MainActivity.this, String.valueOf(position), Toast.LENGTH_LONG).show();
-                    //mStudents.remove(mposition);
-                    //madapter.notifyDataSetChanged();
-                //}
-                //Log.d("Students", "Students size: " + mStudents.size());
+                // DELETE
+                if(!mGroups.isEmpty()) {
+                    Group group = mGroups.get(mAdapter.getGroupPosition());
+                    ArrayList<Student> Students = group.students;
+                    Students.remove(mAdapter.getChildPosition());
+
+                    if (Students.isEmpty()) {
+                        mGroups.remove(mAdapter.getGroupPosition());
+                    } else {
+                        group.students = Students;
+                        mGroups.set(mAdapter.getGroupPosition(), group);
+                    }
+                    mAdapter.notifyDataSetChanged();
+                }
+                //Log.d("OnClck", "mGroups.size= " +  mGroups.size());
             }
             break;
 
@@ -83,31 +93,37 @@ public class MainActivity extends AppCompatActivity {
 
                 if (data.getExtras() != null) {
                     Student student = data.getParcelableExtra(EXTRA_STUDENT);
-                    String group_num = data.getStringExtra(EXTRA_GROUP);
+                    int group_num = data.getIntExtra(EXTRA_GROUP,0);
                     ArrayList<Student> Students = new ArrayList<>();
 
                     int i = 0;
 
-                    while (i <= mGroups.size()+1 ) {
-                        if (mGroups.get(i).number == group_num) {
-                            break;
+                    if (!mGroups.isEmpty()) {
+                        // Ищем есть ли у нас уже группа с таким номером
+                        //Log.d("onActivityResult", "group_num= " + group_num + "  mGroups.size= " +  mGroups.size());
+
+                        while (i < mGroups.size()) {
+                            //Log.d("onActivityResult", "i= " + i + "  mGroups.size= " +  mGroups.size());
+                            if (mGroups.get(i).number == group_num) {
+                                break;
+                            }
+                            i++;
                         }
-                        i++;
-                    };
-
-                    if (i > mGroups.size()+1) {
-
-                    }
-                    else {
-
                     }
 
-
-                    mGroups.get(i).number
-
-                    Students.add(student);
-                    Group group = new Group(group_num, Students);
-                    mGroups.add(group);
+                    if (i+1 > mGroups.size()) {
+                        //ADD New group
+                        Students.add(student);
+                        Group group = new Group(group_num, Students);
+                        mGroups.add(group);
+                    } else {
+                        // нужно добавить студента в сущ. группу
+                        Group group = mGroups.get(i);
+                        Students = group.students;
+                        Students.add(student);
+                        group.students = Students;
+                        mGroups.set(i, group);
+                    }
                     mAdapter.notifyDataSetChanged();
                 }
             }
@@ -118,8 +134,64 @@ public class MainActivity extends AppCompatActivity {
 
                 if (data.getExtras() != null) {
                     Student student = data.getParcelableExtra(EXTRA_STUDENT);
-                    //mStudents.set(mposition, student);
-                    //madapter.notifyDataSetChanged();
+                    int group_num = data.getIntExtra(EXTRA_GROUP,0);
+                    ArrayList<Student> Students = new ArrayList<>();
+
+                    if (mGroups.get(mAdapter.getGroupPosition()).number == group_num) {
+                        // группа не поменялась
+                        Group group = mGroups.get(mAdapter.getGroupPosition());
+                        Students = group.students;
+                        Students.set(mAdapter.getChildPosition(),student);
+                        group.students = Students;
+                        mGroups.set(mAdapter.getGroupPosition(), group);
+                    }
+                    else {
+                        // группа поменялась
+
+                        //удалим выбранный элемент из группы
+                        Group group = mGroups.get(mAdapter.getGroupPosition());
+                        Students = group.students;
+                        Students.remove(mAdapter.getChildPosition());
+
+                        if(Students.isEmpty()) {
+                            mGroups.remove(mAdapter.getGroupPosition());
+                        }
+                        else {
+                            group.students = Students;
+                            mGroups.set(mAdapter.getGroupPosition(), group);
+                        }
+
+                        //добавим "нового" студента в новую группу
+                        int i = 0;
+
+                        if (!mGroups.isEmpty()) {
+                            // Ищем есть ли у нас уже группа с таким номером
+                            //Log.d("onActivityResult", "group_num= " + group_num + "  mGroups.size= " +  mGroups.size());
+
+                            while (i < mGroups.size()) {
+                                //Log.d("onActivityResult", "i= " + i + "  mGroups.size= " +  mGroups.size());
+                                if (mGroups.get(i).number == group_num) {
+                                    break;
+                                }
+                                i++;
+                            }
+                        }
+
+                        if (i+1 > mGroups.size()) {
+                            //ADD New group
+                            Students.add(student);
+                            group = new Group(group_num, Students);
+                            mGroups.add(group);
+                        } else {
+                            // нужно добавить студента в сущ. группу
+                            group = mGroups.get(i);
+                            Students = group.students;
+                            Students.add(student);
+                            group.students = Students;
+                            mGroups.set(i, group);
+                        }
+                    }
+                    mAdapter.notifyDataSetChanged();
                 }
             }
         }
