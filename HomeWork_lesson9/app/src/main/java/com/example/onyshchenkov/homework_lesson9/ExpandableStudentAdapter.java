@@ -27,11 +27,16 @@ public class ExpandableStudentAdapter extends BaseExpandableListAdapter {
         minflater = LayoutInflater.from(context);
     }
 
-    public int getGroupPosition(){
+    public void clrPosition() {
+        mgroupPosition = -1;
+        mchildPosition = -1;
+    }
+
+    public int getGroupPosition() {
         return mgroupPosition;
     }
 
-    public int getChildPosition(){
+    public int getChildPosition() {
         return mchildPosition;
     }
 
@@ -56,7 +61,7 @@ public class ExpandableStudentAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getGroup(int groupPosition) {
-       // Log.d("StudentAdapter", "getGroup " + mGroups.get(groupPosition));
+        // Log.d("StudentAdapter", "getGroup " + mGroups.get(groupPosition));
         return mGroups.get(groupPosition);
     }
 
@@ -65,7 +70,7 @@ public class ExpandableStudentAdapter extends BaseExpandableListAdapter {
         convertView = minflater.inflate(mGroupResource, null);
 
         Group group = (Group) getGroup(groupPosition);
-        ((TextView)convertView.findViewById(R.id.textViewGroupName)).setText(String.valueOf(group.number));
+        ((TextView) convertView.findViewById(R.id.textViewGroupName)).setText(String.valueOf(group.number));
 
         /*
 
@@ -87,11 +92,11 @@ public class ExpandableStudentAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         convertView = minflater.inflate(mChildResource, null);
-        Student student = (Student) getChild(groupPosition,childPosition);
+        Student student = (Student) getChild(groupPosition, childPosition);
 
-        ((TextView)convertView.findViewById(R.id.textViewFirstName)).setText(student.firstName);
-        ((TextView)convertView.findViewById(R.id.textViewLastName)).setText(student.lastName);
-        ((TextView)convertView.findViewById(R.id.textViewAge)).setText(String.valueOf(student.age));
+        ((TextView) convertView.findViewById(R.id.textViewFirstName)).setText(student.firstName);
+        ((TextView) convertView.findViewById(R.id.textViewLastName)).setText(student.lastName);
+        ((TextView) convertView.findViewById(R.id.textViewAge)).setText(String.valueOf(student.age));
 
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,14 +108,14 @@ public class ExpandableStudentAdapter extends BaseExpandableListAdapter {
             }
         });
 
-        if(groupPosition == mgroupPosition && childPosition == mchildPosition){
+        if (groupPosition == mgroupPosition && childPosition == mchildPosition) {
             //radioButton.setChecked(true);
             //Log.d("setBackgroundColor", "setBackgroundColor " + R.color.colorselected );
             convertView.setBackgroundResource(R.color.colorselected);
 
 
-                    //(ContextCompat.getColor(getContext(),R.color.colorselected));
-        }else {
+            //(ContextCompat.getColor(getContext(),R.color.colorselected));
+        } else {
             //radioButton.setChecked(false);
             //Log.d("setBackgroundColor", "setBackgroundColor " + R.color.colorunselected );
             convertView.setBackgroundResource(R.color.colorunselected);
@@ -118,8 +123,6 @@ public class ExpandableStudentAdapter extends BaseExpandableListAdapter {
 
         return convertView;
     }
-
-
 
 
     @Override

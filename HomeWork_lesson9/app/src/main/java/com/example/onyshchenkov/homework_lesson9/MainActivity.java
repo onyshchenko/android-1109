@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
                         group.students = Students;
                         mGroups.set(mAdapter.getGroupPosition(), group);
                     }
+                    mAdapter.clrPosition();
                     mAdapter.notifyDataSetChanged();
                 }
                 //Log.d("OnClck", "mGroups.size= " +  mGroups.size());
@@ -135,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 if (data.getExtras() != null) {
                     Student student = data.getParcelableExtra(EXTRA_STUDENT);
                     int group_num = data.getIntExtra(EXTRA_GROUP,0);
-                    ArrayList<Student> Students = new ArrayList<>();
+                    ArrayList<Student> Students;
 
                     if (mGroups.get(mAdapter.getGroupPosition()).number == group_num) {
                         // группа не поменялась
@@ -179,8 +180,9 @@ public class MainActivity extends AppCompatActivity {
 
                         if (i+1 > mGroups.size()) {
                             //ADD New group
-                            Students.add(student);
-                            group = new Group(group_num, Students);
+                            ArrayList<Student> Students_new = new ArrayList<>();
+                            Students_new.add(student);
+                            group = new Group(group_num, Students_new);
                             mGroups.add(group);
                         } else {
                             // нужно добавить студента в сущ. группу
