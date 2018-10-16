@@ -62,6 +62,11 @@ public class MainActivity extends AppCompatActivity {
             case R.id.button3: {
                 // DELETE
                 if(!mGroups.isEmpty()) {
+                    mGroups.get(mAdapter.getGroupPosition()).students.remove(mAdapter.getChildPosition());
+                    if (mGroups.get(mAdapter.getGroupPosition()).students.isEmpty()) {
+                        mGroups.remove(mAdapter.getGroupPosition());
+                    }
+                    /*
                     Group group = mGroups.get(mAdapter.getGroupPosition());
                     ArrayList<Student> Students = group.students;
                     Students.remove(mAdapter.getChildPosition());
@@ -72,8 +77,20 @@ public class MainActivity extends AppCompatActivity {
                         group.students = Students;
                         mGroups.set(mAdapter.getGroupPosition(), group);
                     }
-                    mAdapter.clrPosition();
+                    */
+
                     mAdapter.notifyDataSetChanged();
+
+                    if(mListView.isGroupExpanded(mAdapter.getGroupPosition())){
+                        mListView.collapseGroup(mAdapter.getGroupPosition());
+                        mListView.expandGroup(mAdapter.getGroupPosition());
+                    }else {
+                        mListView.collapseGroup(mAdapter.getGroupPosition());
+                        mListView.expandGroup(mAdapter.getGroupPosition());
+                    }
+
+                    mAdapter.clrPosition();
+
                 }
                 //Log.d("OnClck", "mGroups.size= " +  mGroups.size());
             }

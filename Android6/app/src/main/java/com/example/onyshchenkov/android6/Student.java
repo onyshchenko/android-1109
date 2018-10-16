@@ -4,9 +4,12 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Student implements Parcelable {
+    public long id;
     public String firstName;
     public String lastName;
     public int age;
+
+    private int griupid;
 
     public Student() {
     }

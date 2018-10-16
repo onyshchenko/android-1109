@@ -49,7 +49,8 @@ public class ExpandableStudentAdapter extends BaseExpandableListAdapter {
     @Override
     public int getChildrenCount(int groupPosition) {
         //Log.d("StudentAdapter", "getChildrenCount " + mGroups.get(groupPosition).students.size());
-        return mGroups.get(groupPosition).students.size();
+        int rr = mGroups.get(groupPosition).students.size();
+        return rr; //mGroups.get(groupPosition).students.size();
     }
 
     @Override
