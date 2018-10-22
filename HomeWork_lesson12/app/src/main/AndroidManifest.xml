@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.onyshchenkov.android8">
+    package="com.example.onyshchenkov.homework_lesson12">
 
     <application
         android:allowBackup="true"
@@ -16,11 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".Activity2" />
+        <activity android:name=".Activity3" />
+        <activity android:name=".SettingsActivity" />
 
-        <service
-            android:name=".MyService"
-            android:enabled="true"
-            android:exported="true" />
         <service
             android:name=".MyIntentService"
             android:exported="false"></service>

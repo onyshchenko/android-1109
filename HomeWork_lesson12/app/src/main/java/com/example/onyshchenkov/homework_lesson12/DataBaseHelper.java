@@ -1,4 +1,4 @@
-package com.example.onyshchenkov.android8;
+package com.example.onyshchenkov.homework_lesson12;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -50,11 +50,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_STUDENTS);
         db.execSQL(CREATE_TABLE_GROUPS);
-
-        for (int i = 0; i < 50; i++){
-            insert_student(new Student("Ivan", "Ivanov", 25), "","", db);
-        }
-
     }
 
     @Override
@@ -76,15 +71,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     public String insert_student(Student student, String group_name, String group_uuid) {
-        SQLiteDatabase db = getWritableDatabase();
-        return insert_student(student, group_name, group_uuid, db);
-    }
-
-
-    private String insert_student(Student student, String group_name, String group_uuid, SQLiteDatabase db) {
         long id = 0;
         String str_uuid_group = "";
-        String str_uuid = UUID.randomUUID().toString();
+        String str_uuid = UUID.randomUUID().toString();;
+        SQLiteDatabase db = getWritableDatabase();
 
         try {
             if (group_uuid.equals("")) {
@@ -115,7 +105,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return str_uuid;
     }
 
-    public int update_student(Student student, String group) {
+    public int update_student(Student student) {
         //long id = 0;
         int cnt_rows = 0;
         String str_uuid = "";
@@ -123,11 +113,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         try {
 
-            str_uuid = getGroupId(group);
+            str_uuid = getGroupId(student.GroupName);
             if (str_uuid == "") {
                 //Log.d("update_student", "getGroupId " + id);
                 // такой группы еще нет
-                str_uuid = insertGroup(group,"");
+                str_uuid = insertGroup(student.GroupName,"");
             }
             // Такая группа уже существует
 
@@ -140,7 +130,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             //Log.d("update_student", "student.id " + student.id);
 
             // updating row
-            cnt_rows = db.update(TABLE_NAME_STUDENTS, values, COLUMN_ID_STUDENTS + " = " + student.id, null);
+            cnt_rows = db.update(TABLE_NAME_STUDENTS, values, COLUMN_ID_STUDENTS + " = '" + student.id + "'", null);
             //Log.d("update_student", "cnt_rows " + cnt_rows);
 
 
@@ -177,6 +167,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                             cursor.getString(cursor.getColumnIndex(COLUMN_ID_STUDENTS));
                     student.GroupId =
                             cursor.getString(cursor.getColumnIndex(COLUMN_GROUPID_STUDENTS));
+                    student.GroupName =
+                            cursor.getString(cursor.getColumnIndex(COLUMN_NAME_GROUPS));
                     student.FirstName =
                             cursor.getString(cursor.getColumnIndex(COLUMN_FIRSTNAME_STUDENTS));
                     student.LastName =
@@ -309,7 +301,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
 
         try {
-            count = db.delete(TABLE_NAME_STUDENTS, COLUMN_ID_STUDENTS + "=" + str_uuid, null);
+            count = db.delete(TABLE_NAME_STUDENTS, COLUMN_ID_STUDENTS + " = '" + str_uuid + "'", null);
         } catch (Exception e) {
             e.printStackTrace();
         }
