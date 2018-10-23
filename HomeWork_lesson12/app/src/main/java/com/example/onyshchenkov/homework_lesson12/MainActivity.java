@@ -39,9 +39,9 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_STUDENT = "com.example.onyshchenkov.homework_lesson12.student";
     public static final String EXTRA_GROUP = "com.example.onyshchenkov.homework_lesson12.group";
 
-    public final String BACKUP_FOLDER = "MyFolder";
+    public final String BACKUP_FOLDER = "MyFolder_lesson12";
     public final String BACKUP_FILE_STUDENTS = "Students.txt";
-    public final String BACKUP_FILE_GROUPS = "Groups.txt";
+    //public final String BACKUP_FILE_GROUPS = "Groups.txt";
 
     //public static Cursor mstudentsCursor = null;
     private int mPosition = -1;
@@ -249,15 +249,17 @@ public class MainActivity extends AppCompatActivity {
         Log.d("exportToFile", "      ***********************");
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + BACKUP_FOLDER);
-/*
-            ArrayList<Student> students = mHelper.getStudents();
+
+            //ArrayList<Student> students = mHelper.getStudents();
             Gson gson = new GsonBuilder().create();
-            String json = gson.toJson(students);
+            String json = gson.toJson(mStudents);
 
             Log.d("json", json);
 
             saveExternalFile(folder, BACKUP_FILE_STUDENTS, json);
 
+            Toast.makeText(this, "File was saved", Toast.LENGTH_SHORT).show();
+/*
             ArrayList<Group> groups = mHelper.getGroups();
             json = gson.toJson(groups);
             Log.d("json", json);
@@ -274,20 +276,22 @@ public class MainActivity extends AppCompatActivity {
         Log.d("importToDB", "      ***********************");
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + BACKUP_FOLDER);
+/*
             String json = readExternalFile(folder, BACKUP_FILE_GROUPS);
 
             ArrayList<Group> groups = new Gson().fromJson(json, new TypeToken<ArrayList<Group>>(){}.getType());
-/*
+
             for (int i=0; i < groups.size(); i++){
                 String str_uuid = mHelper.insertGroup(groups.get(i).groupName, groups.get(i).groupId);
                 //Log.d("importToDB", "groupName: " + groups.get(i).groupName + " groupId: " + groups.get(i).groupId + " str_uuid: " + str_uuid);
             }
-
-            json = readExternalFile(folder, BACKUP_FILE_STUDENTS);
+*/
+            String json = readExternalFile(folder, BACKUP_FILE_STUDENTS);
             ArrayList<Student> students = new Gson().fromJson(json, new TypeToken<ArrayList<Student>>(){}.getType());
 
             for (int i=0; i < students.size(); i++){
-                String str_uuid = mHelper.insert_student(students.get(i), "", students.get(i).GroupId);
+                MyIntentService.saveStudent(this, students.get(i));
+                    //String str_uuid = mHelper.insert_student(students.get(i), "", students.get(i).GroupId);
                 //Log.d("importToDB", "groupName: " + groups.get(i).groupName + " groupId: " + groups.get(i).groupId + " str_uuid: " + str_uuid);
             }
             //mAdapter.notifyDataSetChanged();
@@ -297,6 +301,8 @@ public class MainActivity extends AppCompatActivity {
             mAdapter.changeCursor(mstudentsCursor);
             mAdapter.notifyDataSetChanged();
   */
+
+            Toast.makeText(this, "File was loaded", Toast.LENGTH_SHORT).show();
         }
         else {
             Toast.makeText(this, "External flash memory didn't mounted", Toast.LENGTH_LONG).show();
