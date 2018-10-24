@@ -2,6 +2,27 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.onyshchenkov.simpledialer">
 
+    <!--
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS"/>
+    <uses-permission android:name="android.permission.READ_CALL_LOG"/>
+
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+-->
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.QUICKBOOT_POWERON" />
+    <!--<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
+    <!-- <uses-permission android:name="android.permission.READ_PROFILE" /> -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!--<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/> -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -34,6 +55,14 @@
             </intent-filter>
         </activity>
 
+        <receiver
+            android:name=".PhoneStateReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+        </receiver>
         <service
             android:name=".CallService"
             android:permission="android.permission.BIND_INCALL_SERVICE">
@@ -46,7 +75,9 @@
         </service>
 
 
-        <activity android:name=".CallActivity"></activity>
+        <activity android:name=".CallActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
+
     </application>
 
 </manifest>

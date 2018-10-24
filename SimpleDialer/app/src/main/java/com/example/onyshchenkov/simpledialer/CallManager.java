@@ -26,7 +26,7 @@ public class CallManager {
 
     public void updateCall(Call call) {
         currentCall = call;
-        //Log.d("CallManager", "Call.Callback onStateChanged: " + call);
+        Log.d("CallManager", "Call.Callback onStateChanged: " + call);
         if (call != null) {
             if (listener != null) {
                 listener.onUpdateCall("updateCall", currentCall);
