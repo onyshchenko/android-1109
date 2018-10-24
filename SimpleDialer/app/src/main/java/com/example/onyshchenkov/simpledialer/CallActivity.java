@@ -37,7 +37,7 @@ public class CallActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_call);
 
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        //getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 
         ImageView buttonAnswer = findViewById(R.id.buttonAnswer);
         ImageView buttonHangup = findViewById(R.id.buttonHangup);
@@ -84,7 +84,7 @@ public class CallActivity extends AppCompatActivity {
         });
     }
 
-   public void updateView (Call call){ //(gsmCall gsmCall){
+   public void updateView (Call call){
        //Log.d("CallActivity", "Call onStateChanged: " + call);
 
        String phoneNumber = call.getDetails().getHandle().toString().substring(4);
