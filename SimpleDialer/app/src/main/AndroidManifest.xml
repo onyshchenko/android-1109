@@ -3,6 +3,12 @@
     package="com.example.onyshchenkov.simpledialer">
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+<!--
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"/>
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+-->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
 
     <!--
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
@@ -45,20 +51,18 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".PhoneStateReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.PHONE_STATE" />
-            </intent-filter>
-        </receiver>
         <service
             android:name=".CallService"
             android:permission="android.permission.BIND_INCALL_SERVICE">
             <meta-data
                 android:name="android.telecom.IN_CALL_SERVICE_UI"
                 android:value="true" />
+            <!--
+            <meta-data
+                android:name="android.telecom.INCLUDE_EXTERNAL_CALLS"
+                android:value="true" />
+
+                -->
             <intent-filter>
                 <action android:name="android.telecom.InCallService" />
             </intent-filter>

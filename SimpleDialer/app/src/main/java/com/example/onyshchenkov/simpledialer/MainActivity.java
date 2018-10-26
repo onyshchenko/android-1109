@@ -2,8 +2,10 @@ package com.example.onyshchenkov.simpledialer;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.BaseColumns;
@@ -12,11 +14,15 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telecom.PhoneAccount;
+import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.sql.Struct;
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -32,15 +38,164 @@ public class MainActivity extends AppCompatActivity {
         checkDefaultDialer();
 
         if (hasPermission(Manifest.permission.READ_CONTACTS)) {
-            readcontact();
+            //readcontact();
         } else {
             requestPermission(new String[]{Manifest.permission.READ_CONTACTS});
         }
+
+
+        //Manifest.permission.READ_PHONE_STATE
+
+        if (hasPermission(Manifest.permission.READ_PHONE_STATE)) {
+            //readcontact();
+        } else {
+            requestPermission(new String[]{Manifest.permission.READ_PHONE_STATE});
+
+            //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, MAKE_CALL_PERMISSION_REQUEST_CODE);
+
+        }
     }
 
-    private void readcontact(){
+    private void readcontact() {
+
+        Cursor contacts = getContentResolver().query(
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+
+        // Loop through the contacts
+        while (contacts.moveToNext())
+        {
+            // Get the current contact name
+            String name = contacts.getString(
+                    contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY));
+
+            // Get the current contact phone number
+            String phoneNumber = contacts.getString(
+                    contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)).replaceAll("\\s+","");
+
+            contacts.moveToLast();
+
+        }
+        contacts.close();
+
+
+/*
+        ContentResolver cr = getContentResolver();
+        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null,
+                null, null, null);
+        if (cur.getCount() > 0) {
+            while (cur.moveToNext()) {
+                String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
+                String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+
+                if (name.equals("Коханий")){
+                    Log.d("Names", name);
+                }
+                Log.d("Names", name);
+                if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0)
+                {
+                    // Query phone here. Covered next
+                    Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ id,null, null);
+                    while (phones.moveToNext()) {
+                        String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        Log.d("Number", phoneNumber);
+                    }
+                    phones.close();
+                }
+
+            }
+        }
+*/
+
+
+        ContentResolver cr = getContentResolver();
+/*
+        Cursor phones = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = 394" , null, null);
+        while (phones.moveToNext()) {
+            String number = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+            int type = phones.getInt(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+            switch (type) {
+                case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
+                    // do something with the Home number here...
+                    break;
+                case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
+                    // do something with the Mobile number here...
+                    break;
+                case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
+                    // do something with the Work number here...
+                    break;
+            }
+        }
+        phones.close();
+*/
+
+
+        //ContactsContract.Contacts.CONTENT_URI
+        Cursor cur = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                ContactsContract.CommonDataKinds.Phone.NUMBER + " like '%+67 236 3101%'", null, null);
+        if (cur != null && cur.getCount() > 0) {
+            while (cur.moveToNext()) {
+                String id = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID));
+                String id2 = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
+                String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                String number = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+
+                String[] columnNames = cur.getColumnNames();
+
+                String string1;
+                for (int i = 0; i < columnNames.length; i++) {
+                    string1 = cur.getString(cur.getColumnIndex(columnNames[i]));
+                }
+// Data10 - all; Data4; Data1
+
+
+                if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+                    //Query phone here
+                    Cursor pCur = cr.query(
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                            null,
+                                /*
+                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",
+                                new String[]{id},
+                                */
+                            null,//ContactsContract.CommonDataKinds.Phone.NUMBER + " like '%23631%' ",
+                            null,
+
+                            null);
+                    while (pCur != null && pCur.moveToNext()) {
+                        // Get phone numbers here
+
+                        String disp_name = pCur.getString(pCur.getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
+
+                        String[] columnNames1 = pCur.getColumnNames();
+
+                        String string11;
+                        for (int i = 0; i < columnNames1.length; i++) {
+                            string11 = pCur.getString(pCur.getColumnIndex(columnNames1[i]));
+                        }
+
+                        //ContactsContract.CommonDataKinds.Phone._ID + " = " + identifier
+
+                    }
+                    pCur.close();
+
+                }
+            }
+        }
+
+        cur.close();
+
+
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode("673214159"));
         String name = "?";
+
 
         ContentResolver contentResolver = getContentResolver();
 //content://com.android.contacts/phone_lookup/0673214159
@@ -48,13 +203,16 @@ public class MainActivity extends AppCompatActivity {
         //                ContactsContract.PhoneLookup.DISPLAY_NAME }
         Cursor contactLookup = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
 
+
+        //ContactsContract.CommonDataKinds.Phone.NUMBER
+
         try {
             if (contactLookup != null && contactLookup.getCount() > 0) {
                 String[] columnNames = contactLookup.getColumnNames();
                 contactLookup.moveToNext();
 
                 String string11;
-                for(int i=0;i<columnNames.length;i++){
+                for (int i = 0; i < columnNames.length; i++) {
                     string11 = contactLookup.getString(contactLookup.getColumnIndex(columnNames[i]));
                 }
 
@@ -67,6 +225,11 @@ public class MainActivity extends AppCompatActivity {
                 contactLookup.close();
             }
         }
+
+
+        //finish();
+        //setVisible(false);
+
     }
 
 
@@ -102,8 +265,8 @@ public class MainActivity extends AppCompatActivity {
             }
             */
         } else {
-            if (permissions[0].equals("android.permission.READ_CONTACTS") ) {
-                Toast.makeText(this,"Без этого разрешения названия контактов из телефонной книги отображаться не будут",Toast.LENGTH_SHORT).show();
+            if (permissions[0].equals("android.permission.READ_CONTACTS")) {
+                Toast.makeText(this, "Без этого разрешения названия контактов из телефонной книги отображаться не будут", Toast.LENGTH_SHORT).show();
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -131,6 +294,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, this.getPackageName());
         startActivityForResult(intent, REQUEST_CODE_SET_DEFAULT_DIALER);
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -146,9 +310,9 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("onActivityResult", "User declined request to become default dialer");
                     //Toast.makeText(this, "User declined request to become default dialer", Toast.LENGTH_SHORT).show();
                     break;
-                    default:
-                        //Toast.makeText(this, "Unexpected result code " + requestCode, Toast.LENGTH_SHORT).show();
-                        break;
+                default:
+                    //Toast.makeText(this, "Unexpected result code " + requestCode, Toast.LENGTH_SHORT).show();
+                    break;
             }
         }
     }
