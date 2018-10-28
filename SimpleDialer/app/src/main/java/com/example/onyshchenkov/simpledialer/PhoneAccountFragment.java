@@ -1,9 +1,12 @@
 package com.example.onyshchenkov.simpledialer;
 
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -70,6 +73,48 @@ public class PhoneAccountFragment extends DialogFragment {
 
         mtextView.setText("Виберіть картку для дзвінка на номер: " + mPhoneNumber);
 
+        //getDialog().setCanceledOnTouchOutside(true);
+        //getDialog().setOnCancelListener(cancelListener);
+
+        init();
+
+        return view;
+    }
+
+    @Override
+    public void onCancel(DialogInterface dialog) {
+        if (mListener != null) {
+            mListener.cancel();
+        }
+        super.onCancel(dialog);
+    }
+
+
+    private AdapterView.OnItemClickListener saveListener = new AdapterView.OnItemClickListener() {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            //Log.d("ddd", String.valueOf(position));
+            if (mListener != null) {
+                mListener.save(position);
+            }
+
+        }
+    };
+
+/*
+    private View.OnClickListener cancelListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (mListener != null) {
+                mListener.cancel();
+            }
+        }
+    };
+*/
+    private void init() {
+
         /*
             String label = phoneAccount.getLabel().toString();
             Icon icon = phoneAccount.getIcon();
@@ -89,40 +134,6 @@ public class PhoneAccountFragment extends DialogFragment {
 
         mlistView.setOnItemClickListener(saveListener);
 
-        init();
-
-        return view;
-    }
-
-    private AdapterView.OnItemClickListener saveListener = new AdapterView.OnItemClickListener() {
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-            Log.d("ddd", String.valueOf(position));
-            if (mListener != null) {
-                mListener.save(position);
-            }
-
-        }
-    };
-
-    private View.OnClickListener cancelListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (mListener != null) {
-                mListener.cancel();
-            }
-        }
-    };
-
-    private void init() {
-
-        /*
-        mTextViewFirstName.setText(mStudent.firstName);
-        mTextViewLastName.setText(mStudent.lastName);
-        mTextViewAge.setText(String.valueOf(mStudent.age));
-        */
     }
 
     public interface ActionListener {

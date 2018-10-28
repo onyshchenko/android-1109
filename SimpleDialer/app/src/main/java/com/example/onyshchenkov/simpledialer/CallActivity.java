@@ -93,21 +93,6 @@ public class CallActivity extends AppCompatActivity {
 
         //this.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 
-        ImageView buttonAnswer = findViewById(R.id.buttonAnswer);
-        ImageView buttonHangup = findViewById(R.id.buttonHangup);
-
-        mtextDisplayName = findViewById(R.id.textDisplayName);
-        mtextDuration = findViewById(R.id.textDuration);
-        mtextStatus = findViewById(R.id.textStatus);
-
-        mtextDisplayName.setText(searchincontacts(mPhoneNumber));
-        mtextDuration.setVisibility(View.INVISIBLE);
-        //mtextStatus.setVisibility(View.VISIBLE);
-        //mtextStatus.setText("Incoming call");
-
-
-        mTimer = new Timer();
-        mMyTimerTask = new MyTimerTask();
 
         CallManager.INSTANCE.setCustomObjectListener(new CallManager.MyCustomObjectListener() {
             @Override
@@ -129,9 +114,27 @@ public class CallActivity extends AppCompatActivity {
             }
         });
 
+        ImageView buttonAnswer = findViewById(R.id.buttonAnswer);
+        ImageView buttonHangup = findViewById(R.id.buttonHangup);
+
+        mtextDisplayName = findViewById(R.id.textDisplayName);
+        mtextDuration = findViewById(R.id.textDuration);
+        mtextStatus = findViewById(R.id.textStatus);
+
+        mtextDisplayName.setText(searchincontacts(mPhoneNumber));
+        mtextDuration.setVisibility(View.INVISIBLE);
+        //mtextStatus.setVisibility(View.VISIBLE);
+        //mtextStatus.setText("Incoming call");
+
+
+        mTimer = new Timer();
+        mMyTimerTask = new MyTimerTask();
+
         buttonAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                findViewById(R.id.buttonAnswer).setEnabled(false);
+
                 Log.d("CallActivity", "onClick_green");
 
                 CallManager.INSTANCE.acceptCall();
@@ -141,6 +144,8 @@ public class CallActivity extends AppCompatActivity {
         buttonHangup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                findViewById(R.id.buttonHangup).setEnabled(false);
+                findViewById(R.id.buttonAnswer).setEnabled(false);
                 Log.d("CallActivity", "onClick_red");
                 //mTimer.cancel();
                 CallManager.INSTANCE.cancelCall();
@@ -162,8 +167,10 @@ public class CallActivity extends AppCompatActivity {
                 public void cancel() {
                     //getSupportLoaderManager().initLoader(0, null, MainActivity.this);
                     fragment.dismiss();
+                    CallManager.INSTANCE.cancelCall();
                 }
             });
+
             fragment.show(getSupportFragmentManager(), "dialog");
         }
     }
@@ -183,12 +190,10 @@ public class CallActivity extends AppCompatActivity {
         // Loop through the contacts
         while (contacts.moveToNext()) {
             // Get the current contact name
-            String name = contacts.getString(
-                    contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY));
+            String name = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY));
 
             // Get the current contact phone number
-            String phoneNumber = contacts.getString(
-                    contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)).replaceAll("\\s+", "");
+            String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)).replaceAll("\\s+", "");
 
             if (mPhoneNumber.contains(phoneNumber)) {
                 contacts.moveToLast();
@@ -213,9 +218,7 @@ public class CallActivity extends AppCompatActivity {
     }
 
     public void updateView(Call call) {
-        //Log.d("CallActivity", "Call onStateChanged: " + call);
-
-        String phoneNumber = call.getDetails().getHandle().toString().substring(4);
+        Log.d("CallActivity", "Call onStateChanged: " + call.getState());
 
         switch (call.getState()) {
             case STATE_ACTIVE:
@@ -223,11 +226,16 @@ public class CallActivity extends AppCompatActivity {
                 mtextStatus.setText("");
                 mtextDuration.setVisibility(View.VISIBLE);
                 mStartCallTime = (new Date()).getTime() / 1000;
-                try {
+                if(mTimer != null) {
                     mTimer.schedule(mMyTimerTask, 1000, 1000);
+                }
+                /*
+                try {
+
                 } catch (Exception e){
                     e.printStackTrace();
                 }
+                */
                 break;
             case STATE_CONNECTING:
                 mtextStatus.setGravity(View.VISIBLE);
@@ -247,8 +255,11 @@ public class CallActivity extends AppCompatActivity {
             case STATE_DISCONNECTED:
                 mtextStatus.setGravity(View.VISIBLE);
                 mtextStatus.setText("Finished call");
-                //mTimer.cancel();
-                mTimer.purge();
+                if (mTimer != null) {
+                    mTimer.cancel();
+                    mTimer.purge();
+                    mTimer = null;
+                }
                 //mtextDuration.setVisibility(View.INVISIBLE);
                 finish();
                 break;
@@ -256,7 +267,11 @@ public class CallActivity extends AppCompatActivity {
                 mtextStatus.setGravity(View.VISIBLE);
                 mtextStatus.setText("Finished call");
                 mtextDuration.setVisibility(View.INVISIBLE);
-                mTimer.cancel();
+                if (mTimer != null) {
+                    mTimer.cancel();
+                    mTimer.purge();
+                    mTimer = null;
+                }
                 break;
             case STATE_HOLDING:
                 mtextStatus.setGravity(View.VISIBLE);
@@ -283,6 +298,7 @@ public class CallActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        CallManager.INSTANCE.getCurStatus();
     }
 
     @Override

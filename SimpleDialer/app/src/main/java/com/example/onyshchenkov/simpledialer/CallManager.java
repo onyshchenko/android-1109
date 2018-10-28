@@ -34,6 +34,7 @@ public class CallManager {
 
     public void setCustomObjectListener(MyCustomObjectListener listener) {
         this.listener = listener;
+        //listener.onUpdateCall("updateCall", currentCall);
     }
 
     public void updateCall(Call call) {
@@ -46,12 +47,6 @@ public class CallManager {
         if (call != null) {
             if (listener != null) {
                 listener.onUpdateCall("updateCall", currentCall);
-                /*
-                if (call.getState() == STATE_SELECT_PHONE_ACCOUNT) {
-                    //listener.onPhoheAccount(data);
-                } else {
-                }
-                */
             }
         }
     }
@@ -61,11 +56,7 @@ public class CallManager {
 
         if (currentCall != null) {
             currentCall.phoneAccountSelected(data.handle, false);
-            //if (listener != null) {
-            //listener.onCallAdded("acceptCall", currentCall);
-            //}
         }
-
     }
 
 
@@ -82,14 +73,25 @@ public class CallManager {
         }
     }
 
+    public final void getCurStatus() {
+
+        if (currentCall != null) {
+            if (listener != null) {
+                listener.onUpdateCall("updateCall", currentCall);
+            }
+        }
+    }
+
     public void acceptCall() {
         Log.d("CallManager", "acceptCall");
 
         if (currentCall != null) {
             currentCall.answer(currentCall.getDetails().getVideoState());
+            /*
             if (listener != null) {
                 listener.onCallAdded("acceptCall", currentCall);
             }
+            */
         }
     }
 
@@ -98,9 +100,11 @@ public class CallManager {
 
         if (currentCall != null) {
             currentCall.reject(false, "");
+            /*
             if (listener != null) {
                 listener.onCallRemoved("rejectCall", currentCall);
             }
+            */
         }
 
     }
@@ -110,9 +114,11 @@ public class CallManager {
 
         if (currentCall != null) {
             currentCall.disconnect();
+            /*
             if (listener != null) {
                 listener.onCallRemoved("disconnectCall", currentCall);
             }
+            */
         }
 
     }

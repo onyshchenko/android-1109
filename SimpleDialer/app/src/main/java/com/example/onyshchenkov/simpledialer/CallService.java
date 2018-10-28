@@ -42,6 +42,8 @@ public class CallService extends InCallService {
     public void onCallAdded(Call call) {
         super.onCallAdded(call);
 
+        int debug = 0;
+
         Log.d("CallService", "onCallAdded");
 
         call.registerCallback(callCallback);
@@ -53,12 +55,19 @@ public class CallService extends InCallService {
         Intent intent = new Intent(this, CallActivity.class);
         int state = call.getState();
 
-        intent.putExtra("Status", call.getState());
+        if (debug != 1) {
+            intent.putExtra("Status", call.getState());
+        }
         intent.putExtra("PhoneNumber", schemeSpecificPart);
 
         ArrayList<SelectPA> data = new ArrayList<SelectPA>();
 
-        if (call.getState() == STATE_SELECT_PHONE_ACCOUNT) {
+        if (call.getState() == STATE_SELECT_PHONE_ACCOUNT || debug ==1 ) {
+
+            if (debug == 1) {
+                intent.putExtra("Status", STATE_SELECT_PHONE_ACCOUNT);
+            }
+
             TelecomManager tm = (TelecomManager) getSystemService(Context.TELECOM_SERVICE);
 
             List<PhoneAccountHandle> phoneAccountHandleList = tm.getCallCapablePhoneAccounts();
