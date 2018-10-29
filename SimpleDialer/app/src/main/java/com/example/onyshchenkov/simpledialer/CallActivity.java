@@ -57,16 +57,17 @@ public class CallActivity extends AppCompatActivity {
     private long mStartCallTime;
     private String mPhoneNumber;
     private ArrayList<SelectPA> mSelectPA;
+    private ArrayList<Call> mCall;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); //запретип поворот экрана, при повороте телефона
-
         setContentView(R.layout.activity_call);
 
         Log.d("CallActivity", "onCreate");
+        mCall = new ArrayList<Call>();
+
         Intent intent = getIntent();
         int status = intent.getIntExtra("Status", 0);
         mPhoneNumber = intent.getStringExtra("PhoneNumber");
@@ -90,9 +91,7 @@ public class CallActivity extends AppCompatActivity {
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); //Window flag: as long as this window is visible to the user, keep the device's screen turned on and bright.
 
-
         //this.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-
 
         CallManager.INSTANCE.setCustomObjectListener(new CallManager.MyCustomObjectListener() {
             @Override
@@ -125,7 +124,6 @@ public class CallActivity extends AppCompatActivity {
         mtextDuration.setVisibility(View.INVISIBLE);
         //mtextStatus.setVisibility(View.VISIBLE);
         //mtextStatus.setText("Incoming call");
-
 
         mTimer = new Timer();
         mMyTimerTask = new MyTimerTask();
@@ -175,6 +173,17 @@ public class CallActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        //super.onNewIntent(intent);
+        int status = intent.getIntExtra("Status", 0);
+        mPhoneNumber = intent.getStringExtra("PhoneNumber");
+        mSelectPA = intent.getParcelableArrayListExtra("SelectPA");
+
+        CallManager.INSTANCE.getCurStatus();
+
+    }
+
     private String searchincontacts(String number) {
 
         String DISPLAY_NAME = mPhoneNumber;
@@ -220,15 +229,22 @@ public class CallActivity extends AppCompatActivity {
     public void updateView(Call call) {
         Log.d("CallActivity", "Call onStateChanged: " + call.getState());
 
+
         switch (call.getState()) {
-            case STATE_ACTIVE:
+            case STATE_ACTIVE: {
                 mtextStatus.setGravity(View.GONE);
                 mtextStatus.setText("");
                 mtextDuration.setVisibility(View.VISIBLE);
                 mStartCallTime = (new Date()).getTime() / 1000;
-                if(mTimer != null) {
+
+                if (mTimer != null) {
+                    mTimer.cancel();
+                    mTimer.purge();
+                    mTimer = null;
+                    mTimer = new Timer();
                     mTimer.schedule(mMyTimerTask, 1000, 1000);
                 }
+
                 /*
                 try {
 
@@ -236,23 +252,58 @@ public class CallActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 */
+            }
                 break;
             case STATE_CONNECTING:
                 mtextStatus.setGravity(View.VISIBLE);
                 mtextStatus.setText("Connecting…");
                 mtextDuration.setVisibility(View.INVISIBLE);
                 break;
-            case STATE_DIALING:
+            case STATE_DIALING: {
+                int hashCode = call.getDetails().hashCode();
+                boolean compare_hash = false;
+
+                for (int i = 0; i < mCall.size(); i++) {
+                    if (mCall.get(i).getDetails().hashCode() == hashCode) {
+                        compare_hash = true;
+                    }
+                }
+                if (!compare_hash) {
+                    mCall.add(call);
+                }
+
                 mtextStatus.setGravity(View.VISIBLE);
                 mtextStatus.setText("Calling…");
                 mtextDuration.setVisibility(View.INVISIBLE);
-                break;
-            case STATE_RINGING:
+            }
+            break;
+            case STATE_RINGING: {
+                int hashCode = call.getDetails().hashCode();
+                boolean compare_hash = false;
+
+                for (int i = 0; i < mCall.size(); i++) {
+                    if (mCall.get(i).getDetails().hashCode() == hashCode) {
+                        compare_hash = true;
+                    }
+                }
+                if (!compare_hash) {
+                    mCall.add(call);
+                }
+
                 mtextStatus.setGravity(View.VISIBLE);
                 mtextStatus.setText("Incoming call");
                 mtextDuration.setVisibility(View.INVISIBLE);
+            }
                 break;
-            case STATE_DISCONNECTED:
+            case STATE_DISCONNECTED: {
+                int hashCode = call.getDetails().hashCode();
+
+                for (int i = 0; i < mCall.size(); i++) {
+                    if (mCall.get(i).getDetails().hashCode() == hashCode) {
+                        mCall.remove(i);
+                    }
+                }
+
                 mtextStatus.setGravity(View.VISIBLE);
                 mtextStatus.setText("Finished call");
                 if (mTimer != null) {
@@ -262,6 +313,7 @@ public class CallActivity extends AppCompatActivity {
                 }
                 //mtextDuration.setVisibility(View.INVISIBLE);
                 finish();
+            }
                 break;
             case STATE_DISCONNECTING:
                 mtextStatus.setGravity(View.VISIBLE);
