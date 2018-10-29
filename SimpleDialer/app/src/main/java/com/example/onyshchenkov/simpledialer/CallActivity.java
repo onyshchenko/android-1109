@@ -1,5 +1,6 @@
 package com.example.onyshchenkov.simpledialer;
 
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -15,6 +16,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telecom.Call;
+import android.telecom.PhoneAccount;
+import android.telecom.PhoneAccountHandle;
+import android.telecom.TelecomManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -29,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Observable;
 import java.util.Timer;
@@ -54,27 +59,34 @@ public class CallActivity extends AppCompatActivity {
 
     private Timer mTimer;
     private MyTimerTask mMyTimerTask;
-    private long mStartCallTime;
-    private String mPhoneNumber;
-    private ArrayList<SelectPA> mSelectPA;
+    private Call mСurrentCall = null;
+
+    //private long mStartCallTime;
+    //private String mPhoneNumber;
+    //private ArrayList<SelectPA> mSelectPA;
+    //private ArrayList<Call> mCall;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); //запретип поворот экрана, при повороте телефона
-
         setContentView(R.layout.activity_call);
 
         Log.d("CallActivity", "onCreate");
-        Intent intent = getIntent();
-        int status = intent.getIntExtra("Status", 0);
-        mPhoneNumber = intent.getStringExtra("PhoneNumber");
-        mSelectPA = intent.getParcelableArrayListExtra("SelectPA");
 
-        getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY | WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+        //mCall = new ArrayList<Call>();
+
+        //Intent intent = getIntent();
+        //int status = intent.getIntExtra("Status", 0);
+        //mPhoneNumber = intent.getStringExtra("PhoneNumber");
+        //mSelectPA = intent.getParcelableArrayListExtra("SelectPA");
+
+        getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY |
+                WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LOCAL_FOCUS_MODE);
+
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
 
 
@@ -90,27 +102,31 @@ public class CallActivity extends AppCompatActivity {
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); //Window flag: as long as this window is visible to the user, keep the device's screen turned on and bright.
 
-
         //this.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-
 
         CallManager.INSTANCE.setCustomObjectListener(new CallManager.MyCustomObjectListener() {
             @Override
-            public void onCallAdded(String title, Call call) {
+            public void onCallAdded(Call call) {
                 //Log.d("CallActivity", "onCallAdded " + title + " Call STATE: " + call.getState());
-                updateView(call);
+                //updateView(call);
             }
 
             @Override
-            public void onCallRemoved(String title, Call call) {
+            public void onCallRemoved(Call call) {
                 //Log.d("CallActivity", "onCallRemoved " + title + " Call STATE: " + call.getState());
+                //updateView(call);
+            }
+
+            @Override
+            public void onUpdateCall(Call call) {
+                //Log.d("CallActivity", "oncallCallback " + title + " Call STATE: " + call.getState());
+                mСurrentCall = call;
                 updateView(call);
             }
 
             @Override
-            public void onUpdateCall(String title, Call call) {
-                //Log.d("CallActivity", "oncallCallback " + title + " Call STATE: " + call.getState());
-                updateView(call);
+            public void onFinishCallActivity() {
+                finish();
             }
         });
 
@@ -120,38 +136,45 @@ public class CallActivity extends AppCompatActivity {
         mtextDisplayName = findViewById(R.id.textDisplayName);
         mtextDuration = findViewById(R.id.textDuration);
         mtextStatus = findViewById(R.id.textStatus);
-
+/*
+        Uri uri = call.getDetails().getHandle();
+        String scheme = uri.getScheme();
+        String schemeSpecificPart = uri.getSchemeSpecificPart();
         mtextDisplayName.setText(searchincontacts(mPhoneNumber));
-        mtextDuration.setVisibility(View.INVISIBLE);
+*/
+
         //mtextStatus.setVisibility(View.VISIBLE);
         //mtextStatus.setText("Incoming call");
 
-
         mTimer = new Timer();
         mMyTimerTask = new MyTimerTask();
+        mTimer.schedule(mMyTimerTask, 1000, 1000);
 
         buttonAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                findViewById(R.id.buttonAnswer).setEnabled(false);
+                //findViewById(R.id.buttonAnswer).setEnabled(false);
 
                 Log.d("CallActivity", "onClick_green");
 
-                CallManager.INSTANCE.acceptCall();
+                CallManager.INSTANCE.acceptCall(mСurrentCall);
             }
         });
 
         buttonHangup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                findViewById(R.id.buttonHangup).setEnabled(false);
-                findViewById(R.id.buttonAnswer).setEnabled(false);
+                //findViewById(R.id.buttonHangup).setEnabled(false);
+                //findViewById(R.id.buttonAnswer).setEnabled(false);
                 Log.d("CallActivity", "onClick_red");
-                //mTimer.cancel();
-                CallManager.INSTANCE.cancelCall();
+
+                CallManager.INSTANCE.cancelCall(mСurrentCall);
             }
         });
 
+
+
+        /*
         if (status == STATE_SELECT_PHONE_ACCOUNT) {
 
             final PhoneAccountFragment fragment = PhoneAccountFragment.newInstance(mSelectPA, mPhoneNumber);
@@ -173,11 +196,24 @@ public class CallActivity extends AppCompatActivity {
 
             fragment.show(getSupportFragmentManager(), "dialog");
         }
+        */
+    }
+
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        //super.onNewIntent(intent);
+        //int status = intent.getIntExtra("Status", 0);
+        //mPhoneNumber = intent.getStringExtra("PhoneNumber");
+        //mSelectPA = intent.getParcelableArrayListExtra("SelectPA");
+
+        //CallManager.INSTANCE.getCurStatus();
+
     }
 
     private String searchincontacts(String number) {
 
-        String DISPLAY_NAME = mPhoneNumber;
+        String DISPLAY_NAME = number;
 
         Cursor contacts = getContentResolver().query(
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
@@ -193,27 +229,17 @@ public class CallActivity extends AppCompatActivity {
             String name = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY));
 
             // Get the current contact phone number
-            String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)).replaceAll("\\s+", "");
+            String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)).replaceAll("[^0123456789+]", "");//.replaceAll("\\s+", "").replaceAll("\\D+", "");
 
-            if (mPhoneNumber.contains(phoneNumber)) {
+            if (number.endsWith(phoneNumber)) {
+
+                    //contains(phoneNumber)
                 contacts.moveToLast();
                 DISPLAY_NAME = name;
             }
         }
         contacts.close();
-/*
-        try {
-            if (cur != null && cur.getCount() > 0) {
-                cur.moveToNext();
 
-                DISPLAY_NAME = cur.getString(cur.getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
-            }
-        } finally {
-            if (cur != null) {
-                cur.close();
-            }
-        }
-*/
         return DISPLAY_NAME;
     }
 
@@ -221,57 +247,43 @@ public class CallActivity extends AppCompatActivity {
         Log.d("CallActivity", "Call onStateChanged: " + call.getState());
 
         switch (call.getState()) {
-            case STATE_ACTIVE:
+            case STATE_ACTIVE: {
+                mtextDisplayName.setText(searchincontacts(call.getDetails().getHandle().getSchemeSpecificPart()));
                 mtextStatus.setGravity(View.GONE);
                 mtextStatus.setText("");
                 mtextDuration.setVisibility(View.VISIBLE);
-                mStartCallTime = (new Date()).getTime() / 1000;
-                if(mTimer != null) {
-                    mTimer.schedule(mMyTimerTask, 1000, 1000);
-                }
-                /*
-                try {
-
-                } catch (Exception e){
-                    e.printStackTrace();
-                }
-                */
+            }
                 break;
             case STATE_CONNECTING:
                 mtextStatus.setGravity(View.VISIBLE);
                 mtextStatus.setText("Connecting…");
                 mtextDuration.setVisibility(View.INVISIBLE);
                 break;
-            case STATE_DIALING:
+            case STATE_DIALING: {
+                mtextDisplayName.setText(searchincontacts(call.getDetails().getHandle().getSchemeSpecificPart()));
                 mtextStatus.setGravity(View.VISIBLE);
                 mtextStatus.setText("Calling…");
                 mtextDuration.setVisibility(View.INVISIBLE);
-                break;
-            case STATE_RINGING:
+            }
+            break;
+            case STATE_RINGING: {
+                mtextDisplayName.setText(searchincontacts(call.getDetails().getHandle().getSchemeSpecificPart()));
                 mtextStatus.setGravity(View.VISIBLE);
                 mtextStatus.setText("Incoming call");
                 mtextDuration.setVisibility(View.INVISIBLE);
+            }
                 break;
-            case STATE_DISCONNECTED:
-                mtextStatus.setGravity(View.VISIBLE);
-                mtextStatus.setText("Finished call");
-                if (mTimer != null) {
-                    mTimer.cancel();
-                    mTimer.purge();
-                    mTimer = null;
-                }
-                //mtextDuration.setVisibility(View.INVISIBLE);
-                finish();
-                break;
-            case STATE_DISCONNECTING:
+            case STATE_DISCONNECTED: {
                 mtextStatus.setGravity(View.VISIBLE);
                 mtextStatus.setText("Finished call");
                 mtextDuration.setVisibility(View.INVISIBLE);
-                if (mTimer != null) {
-                    mTimer.cancel();
-                    mTimer.purge();
-                    mTimer = null;
-                }
+                CallManager.INSTANCE.getCurStatus(null);
+            }
+                break;
+            case STATE_DISCONNECTING:
+                mtextStatus.setGravity(View.VISIBLE);
+                mtextStatus.setText("Finishing call");
+                mtextDuration.setVisibility(View.INVISIBLE);
                 break;
             case STATE_HOLDING:
                 mtextStatus.setGravity(View.VISIBLE);
@@ -284,12 +296,41 @@ public class CallActivity extends AppCompatActivity {
                 mtextDuration.setVisibility(View.INVISIBLE);
                 break;
             case STATE_SELECT_PHONE_ACCOUNT:
-/*
-               Intent intent = new Intent();
-               intent.setComponent(new ComponentName("com.android.server.telecom","com.android.server.telecom.settings.EnableAccountPreferenceActivity"));
-               intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-               startActivity(intent);
-*/
+
+                TelecomManager tm = (TelecomManager) getSystemService(Context.TELECOM_SERVICE);
+
+                @SuppressLint("MissingPermission") List<PhoneAccountHandle> phoneAccountHandleList = tm.getCallCapablePhoneAccounts();
+                PhoneAccount phoneAccount;
+                final ArrayList<SelectPA> phoneAccounts = new ArrayList<SelectPA>();
+
+                for (int i = 0; i < phoneAccountHandleList.size(); i++) {
+                    phoneAccount = tm.getPhoneAccount(phoneAccountHandleList.get(i));
+
+                    phoneAccounts.add(new SelectPA(i, phoneAccountHandleList.get(i), phoneAccount.getLabel().toString(), phoneAccount.getIcon()));
+                }
+
+/* handle */
+                /*mtextDisplayName.setText(searchincontacts(call.getDetails().getHandle().getSchemeSpecificPart()));*/
+
+                final PhoneAccountFragment fragment = PhoneAccountFragment.newInstance(phoneAccounts, call.getDetails().getHandle().getSchemeSpecificPart());
+                fragment.setActionListener(new PhoneAccountFragment.ActionListener() {
+
+                    @Override
+                    public void save(int position) {
+                        fragment.dismiss();
+                        CallManager.INSTANCE.acceptPhoneAccount(mСurrentCall, phoneAccounts.get(position).handle);
+                    }
+
+                    @Override
+                    public void cancel() {
+                        //getSupportLoaderManager().initLoader(0, null, MainActivity.this);
+                        fragment.dismiss();
+                        CallManager.INSTANCE.cancelCall(mСurrentCall);
+                    }
+                });
+
+                fragment.show(getSupportFragmentManager(), "dialog");
+
                 break;
         }
     }
@@ -298,7 +339,7 @@ public class CallActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        CallManager.INSTANCE.getCurStatus();
+        CallManager.INSTANCE.getCurStatus(mСurrentCall);
     }
 
     @Override
@@ -306,7 +347,21 @@ public class CallActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    //private Long.toDurationString() = String.format("%02d:%02d:%02d", this / 3600, (this % 3600) / 60, (this % 60));
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer.purge();
+            mTimer = null;
+        }
+    }
+    /*
+    public void onFinishCallActivity(){
+        finish();
+    }
+    */
 
     class MyTimerTask extends TimerTask {
 
@@ -318,9 +373,15 @@ public class CallActivity extends AppCompatActivity {
                 @Override
                 public void run() {
 
-                    long call_duration = ((new Date()).getTime() / 1000) - mStartCallTime;
-                    mtextDuration.setText(String.format("%02d:%02d:%02d", call_duration / 3600, (call_duration % 3600) / 60, (call_duration % 60)));
-                    //String.format("%02d:%02d:%02d", call_duration / 3600, (call_duration % 3600) / 60, (call_duration % 60));
+                    if (mСurrentCall.getState() == STATE_ACTIVE) {
+
+                        long call_duration = (new Date()).getTime();
+
+                        call_duration = (call_duration - mСurrentCall.getDetails().getConnectTimeMillis())/ 1000;
+
+                        mtextDuration.setText(String.format("%02d:%02d:%02d", call_duration / 3600, (call_duration % 3600) / 60, (call_duration % 60)));
+                        //String.format("%02d:%02d:%02d", call_duration / 3600, (call_duration % 3600) / 60, (call_duration % 60));
+                    }
                 }
             });
         }

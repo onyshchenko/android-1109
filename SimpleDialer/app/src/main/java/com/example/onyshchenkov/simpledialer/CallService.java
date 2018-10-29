@@ -31,7 +31,7 @@ public class CallService extends InCallService {
 
     private Call.Callback callCallback = new Callback() {
         public void onStateChanged(Call call, int state) {
-            Log.d("CallService", "Call.Callback onStateChanged: " + call + ", state: " + state);
+            //Log.d("CallService", "Call.Callback onStateChanged: " + call + ", state: " + state);
             CallManager.INSTANCE.updateCall(call);
         }
     };
@@ -42,24 +42,27 @@ public class CallService extends InCallService {
     public void onCallAdded(Call call) {
         super.onCallAdded(call);
 
-        int debug = 0;
+        //int debug = 1;
 
-        Log.d("CallService", "onCallAdded");
+        //Log.d("CallService", "onCallAdded");
 
         call.registerCallback(callCallback);
 
-        Uri uri = call.getDetails().getHandle();
-        String scheme = uri.getScheme();
-        String schemeSpecificPart = uri.getSchemeSpecificPart();
 
         Intent intent = new Intent(this, CallActivity.class);
+        //Bundle bundle = new Bundle();
+
+        //bundle.put("ddd", call);
+        /*
         int state = call.getState();
 
         if (debug != 1) {
             intent.putExtra("Status", call.getState());
         }
-        intent.putExtra("PhoneNumber", schemeSpecificPart);
 
+        //intent.putExtras()
+        //intent.putExtra("PhoneNumber", schemeSpecificPart);
+/*
         ArrayList<SelectPA> data = new ArrayList<SelectPA>();
 
         if (call.getState() == STATE_SELECT_PHONE_ACCOUNT || debug ==1 ) {
@@ -81,43 +84,21 @@ public class CallService extends InCallService {
         }
 
         intent.putParcelableArrayListExtra("SelectPA", data);
-
+*/
         startActivity(intent);
 
-            //call.phoneAccountSelected(handle, false);
-            /*
-
-            PhoneAccount phoneAccount = null;
-            if (handle != null) {
-                phoneAccount = tm.getPhoneAccount(handle);
-            }
-*/
-/*
-            String label = "nextArgRequired";
-            PhoneAccount account = PhoneAccount.builder( handle, label).setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER).build();
-            tm.registerPhoneAccount(account);
-*/
-/*
-            Intent intent = new Intent();
-            intent.setComponent(new ComponentName("com.android.server.telecom", "com.android.server.telecom.settings.EnableAccountPreferenceActivity"));
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-*/
-
-
-        CallManager.INSTANCE.updateCall(call, data);
+        CallManager.INSTANCE.updateCall(call);
     }
 
 
     @Override
     public void onCallRemoved(Call call) {
         super.onCallRemoved(call);
-        Log.d("CallService", "onCallRemoved");
+        //Log.d("CallService", "onCallRemoved");
 
         call.unregisterCallback(callCallback);
         CallManager.INSTANCE.updateCall(null);
     }
-
 
 }
 
