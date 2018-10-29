@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void readcontact() {
-
+/*
         Cursor contacts = getContentResolver().query(
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 null,
@@ -70,20 +70,18 @@ public class MainActivity extends AppCompatActivity {
         while (contacts.moveToNext())
         {
             // Get the current contact name
-            String name = contacts.getString(
-                    contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY));
+            String name = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY));
 
             // Get the current contact phone number
-            String phoneNumber = contacts.getString(
-                    contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)).replaceAll("\\s+","");
+            String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)).replaceAll("\\s+","");
 
             contacts.moveToLast();
 
         }
         contacts.close();
+*/
 
 
-/*
         ContentResolver cr = getContentResolver();
         Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null,
                 null, null, null);
@@ -92,9 +90,9 @@ public class MainActivity extends AppCompatActivity {
                 String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
                 String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 
-                if (name.equals("Коханий")){
-                    Log.d("Names", name);
-                }
+//                if (name.equals("Коханий")){
+//                    Log.d("Names", name);
+//                }
                 Log.d("Names", name);
                 if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0)
                 {
@@ -102,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                     Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,
                             ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ id,null, null);
                     while (phones.moveToNext()) {
-                        String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)).replaceAll("\\s+", "");
                         Log.d("Number", phoneNumber);
                     }
                     phones.close();
@@ -110,10 +108,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }
-*/
 
 
-        ContentResolver cr = getContentResolver();
+
+        //ContentResolver cr = getContentResolver();
 /*
         Cursor phones = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
                 ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = 394" , null, null);
@@ -135,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
         phones.close();
 */
 
-
+/*
         //ContactsContract.Contacts.CONTENT_URI
         Cursor cur = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
                 ContactsContract.CommonDataKinds.Phone.NUMBER + " like '%+67 236 3101%'", null, null);
@@ -161,10 +159,6 @@ public class MainActivity extends AppCompatActivity {
                     Cursor pCur = cr.query(
                             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                             null,
-                                /*
-                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",
-                                new String[]{id},
-                                */
                             null,//ContactsContract.CommonDataKinds.Phone.NUMBER + " like '%23631%' ",
                             null,
 
@@ -225,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
                 contactLookup.close();
             }
         }
-
+*/
 
         //finish();
         //setVisible(false);
