@@ -44,7 +44,7 @@ public class CallService extends InCallService {
 
         //int debug = 1;
 
-        //Log.d("CallService", "onCallAdded");
+        Log.d("CallService", "onCallAdded");
 
         call.registerCallback(callCallback);
 

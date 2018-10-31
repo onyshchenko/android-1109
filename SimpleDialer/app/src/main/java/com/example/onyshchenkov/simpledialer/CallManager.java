@@ -54,7 +54,7 @@ public class CallManager {
             int hashCode = call.getDetails().hashCode();
             boolean compare_hash = false;
 
-            if (call.getState() == STATE_DIALING | call.getState() == STATE_RINGING) {
+            if (call.getState() == STATE_SELECT_PHONE_ACCOUNT | call.getState() == STATE_DIALING | call.getState() == STATE_RINGING) {
 
                 for (int i = 0; i < mCall.size(); i++) {
                     if (mCall.get(i).getDetails().hashCode() == hashCode) {
