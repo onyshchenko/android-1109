@@ -1,6 +1,7 @@
 package com.example.onyshchenkov.simpledialer;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -9,9 +10,11 @@ import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.PowerManager;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -40,6 +43,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import static android.os.PowerManager.PARTIAL_WAKE_LOCK;
 import static android.telecom.Call.STATE_ACTIVE;
 import static android.telecom.Call.STATE_CONNECTING;
 import static android.telecom.Call.STATE_DIALING;
@@ -60,6 +64,8 @@ public class CallActivity extends AppCompatActivity {
     private Timer mTimer;
     private MyTimerTask mMyTimerTask;
     private Call mСurrentCall = null;
+
+    private boolean mPendingShowDialog = false;
 
     //private long mStartCallTime;
     //private String mPhoneNumber;
@@ -87,7 +93,8 @@ public class CallActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LOCAL_FOCUS_MODE);
 
-        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 
         //int sdkInt = Build.VERSION.SDK_INT;
@@ -136,6 +143,8 @@ public class CallActivity extends AppCompatActivity {
         mtextDisplayName = findViewById(R.id.textDisplayName);
         mtextDuration = findViewById(R.id.textDuration);
         mtextStatus = findViewById(R.id.textStatus);
+
+        mtextDuration.setVisibility(View.INVISIBLE);
 /*
         Uri uri = call.getDetails().getHandle();
         String scheme = uri.getScheme();
@@ -199,7 +208,6 @@ public class CallActivity extends AppCompatActivity {
         */
     }
 
-
     @Override
     protected void onNewIntent(Intent intent) {
         //super.onNewIntent(intent);
@@ -209,6 +217,8 @@ public class CallActivity extends AppCompatActivity {
 
         //CallManager.INSTANCE.getCurStatus();
 
+        //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     private String searchincontacts(String number) {
@@ -231,9 +241,7 @@ public class CallActivity extends AppCompatActivity {
             // Get the current contact phone number
             String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)).replaceAll("[^0123456789+]", "");//.replaceAll("\\s+", "").replaceAll("\\D+", "");
 
-            if (number.endsWith(phoneNumber)) {
-
-                    //contains(phoneNumber)
+            if (number.contains(phoneNumber) && phoneNumber.length()+3 >= number.length()) {
                 contacts.moveToLast();
                 DISPLAY_NAME = name;
             }
@@ -296,40 +304,44 @@ public class CallActivity extends AppCompatActivity {
                 mtextDuration.setVisibility(View.INVISIBLE);
                 break;
             case STATE_SELECT_PHONE_ACCOUNT:
+                if (!mPendingShowDialog) {
 
-                TelecomManager tm = (TelecomManager) getSystemService(Context.TELECOM_SERVICE);
+                    TelecomManager tm = (TelecomManager) getSystemService(Context.TELECOM_SERVICE);
 
-                @SuppressLint("MissingPermission") List<PhoneAccountHandle> phoneAccountHandleList = tm.getCallCapablePhoneAccounts();
-                PhoneAccount phoneAccount;
-                final ArrayList<SelectPA> phoneAccounts = new ArrayList<SelectPA>();
+                    @SuppressLint("MissingPermission") List<PhoneAccountHandle> phoneAccountHandleList = tm.getCallCapablePhoneAccounts();
+                    PhoneAccount phoneAccount;
+                    final ArrayList<SelectPA> phoneAccounts = new ArrayList<SelectPA>();
 
-                for (int i = 0; i < phoneAccountHandleList.size(); i++) {
-                    phoneAccount = tm.getPhoneAccount(phoneAccountHandleList.get(i));
+                    for (int i = 0; i < phoneAccountHandleList.size(); i++) {
+                        phoneAccount = tm.getPhoneAccount(phoneAccountHandleList.get(i));
 
-                    phoneAccounts.add(new SelectPA(i, phoneAccountHandleList.get(i), phoneAccount.getLabel().toString(), phoneAccount.getIcon()));
+                        phoneAccounts.add(new SelectPA(i, phoneAccountHandleList.get(i), phoneAccount.getLabel().toString(), phoneAccount.getIcon()));
+                    }
+
+                    /* handle */
+                    /*mtextDisplayName.setText(searchincontacts(call.getDetails().getHandle().getSchemeSpecificPart()));*/
+
+                    final PhoneAccountFragment fragment = PhoneAccountFragment.newInstance(phoneAccounts, call.getDetails().getHandle().getSchemeSpecificPart());
+                    fragment.setActionListener(new PhoneAccountFragment.ActionListener() {
+
+                        @Override
+                        public void save(int position) {
+                            fragment.dismiss();
+                            mPendingShowDialog = false;
+                            CallManager.INSTANCE.acceptPhoneAccount(mСurrentCall, phoneAccounts.get(position).handle);
+                        }
+
+                        @Override
+                        public void cancel() {
+                            fragment.dismiss();
+                            mPendingShowDialog = false;
+                            CallManager.INSTANCE.cancelCall(mСurrentCall);
+                        }
+                    });
+
+                    fragment.show(getSupportFragmentManager(), "dialog");
+                    mPendingShowDialog = true;
                 }
-
-/* handle */
-                /*mtextDisplayName.setText(searchincontacts(call.getDetails().getHandle().getSchemeSpecificPart()));*/
-
-                final PhoneAccountFragment fragment = PhoneAccountFragment.newInstance(phoneAccounts, call.getDetails().getHandle().getSchemeSpecificPart());
-                fragment.setActionListener(new PhoneAccountFragment.ActionListener() {
-
-                    @Override
-                    public void save(int position) {
-                        fragment.dismiss();
-                        CallManager.INSTANCE.acceptPhoneAccount(mСurrentCall, phoneAccounts.get(position).handle);
-                    }
-
-                    @Override
-                    public void cancel() {
-                        //getSupportLoaderManager().initLoader(0, null, MainActivity.this);
-                        fragment.dismiss();
-                        CallManager.INSTANCE.cancelCall(mСurrentCall);
-                    }
-                });
-
-                fragment.show(getSupportFragmentManager(), "dialog");
 
                 break;
         }
@@ -373,14 +385,19 @@ public class CallActivity extends AppCompatActivity {
                 @Override
                 public void run() {
 
-                    if (mСurrentCall.getState() == STATE_ACTIVE) {
+                    if (mСurrentCall != null) {
+                        if ( mСurrentCall.getState() == STATE_ACTIVE) {
 
-                        long call_duration = (new Date()).getTime();
+                            long call_duration = (new Date()).getTime();
 
-                        call_duration = (call_duration - mСurrentCall.getDetails().getConnectTimeMillis())/ 1000;
+                            call_duration = (call_duration - mСurrentCall.getDetails().getConnectTimeMillis()) / 1000;
 
-                        mtextDuration.setText(String.format("%02d:%02d:%02d", call_duration / 3600, (call_duration % 3600) / 60, (call_duration % 60)));
-                        //String.format("%02d:%02d:%02d", call_duration / 3600, (call_duration % 3600) / 60, (call_duration % 60));
+                            mtextDuration.setText(String.format("%02d:%02d:%02d", call_duration / 3600, (call_duration % 3600) / 60, (call_duration % 60)));
+                            //String.format("%02d:%02d:%02d", call_duration / 3600, (call_duration % 3600) / 60, (call_duration % 60));
+                        }
+                    }
+                    else {
+                        CallManager.INSTANCE.getCurStatus(null);
                     }
                 }
             });
