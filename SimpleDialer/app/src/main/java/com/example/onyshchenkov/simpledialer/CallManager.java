@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
+import static android.telecom.Call.STATE_ACTIVE;
 import static android.telecom.Call.STATE_DIALING;
 import static android.telecom.Call.STATE_DISCONNECTED;
 import static android.telecom.Call.STATE_RINGING;
@@ -47,7 +48,7 @@ public class CallManager {
 */
 
     public void updateCall(Call call /*, ArrayList<SelectPA> data*/) {
-        //currentCall = call;
+
         Log.d("CallManager", "Call.Callback onStateChanged: " + call);
         if (call != null) {
 
@@ -64,7 +65,7 @@ public class CallManager {
                 if (!compare_hash) {
                     mCall.add(call);
                 }
-            } else if (call.getState() == STATE_DISCONNECTED ) {
+            } else if (call.getState() == STATE_DISCONNECTED) {
 
                 for (int i = 0; i < mCall.size(); i++) {
                     if (mCall.get(i).getDetails().hashCode() == hashCode) {
@@ -72,7 +73,7 @@ public class CallManager {
                     }
                 }
 
-                if(mCall.size() == 0) {
+                if (mCall.size() == 0) {
                     if (listener != null) {
                         listener.onFinishCallActivity();
                     }
@@ -80,11 +81,24 @@ public class CallManager {
             }
 
             if (listener != null) {
+                int cnt_active_calls = 0;
+                if (mCall.size() > 1) {
+                    for (int i = 0; i < mCall.size(); i++) {
+                        if (mCall.get(i).getState() == Call.STATE_ACTIVE || mCall.get(i).getState() == Call.STATE_HOLDING) {
+                            cnt_active_calls++;
+                        }
+                    }
+                }
+                if (cnt_active_calls == 2) {
+                    listener.onShowChangeCallButton();
+                } else {
+                    listener.onHideChangeCallButton();
+                }
+
                 listener.onUpdateCall(call);
             }
         }
     }
-
 
 
     public void acceptPhoneAccount(Call call, PhoneAccountHandle data) {
@@ -109,23 +123,36 @@ public class CallManager {
         }
     }
 
+    public final void changeCall(Call call) {
+
+        call.hold();
+/*
+        if (mCall.size() > 1) {
+            for (int i = 0; i < mCall.size(); i++) {
+                if (mCall.get(i).getState() == Call.STATE_HOLDING) {
+                    mCall.get(i).unhold();
+
+                }
+            }
+        }
+*/
+    }
+
     public final void getCurStatus(Call call) {
 
         if (call != null) {
             if (listener != null) {
                 listener.onUpdateCall(call);
             }
-        } else if (mCall.size() == 1){
+        } else if (mCall.size() == 1) {
             if (listener != null) {
                 listener.onUpdateCall(mCall.get(0));
             }
-        } else {
-            String ss = "ssss";
         }
     }
 
     public void acceptCall(Call call) {
-        Log.d("CallManager", "acceptCall");
+        //Log.d("CallManager", "acceptCall");
 
         if (call != null) {
             call.answer(call.getDetails().getVideoState());
@@ -144,6 +171,10 @@ public class CallManager {
         public void onUpdateCall(Call call);
 
         public void onFinishCallActivity();
+
+        public void onShowChangeCallButton();
+
+        public void onHideChangeCallButton();
 
         //public void onPhoheAccount(ArrayList<SelectPA> data);
     }

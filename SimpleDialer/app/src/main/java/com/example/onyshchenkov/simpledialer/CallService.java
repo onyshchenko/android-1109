@@ -25,6 +25,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
 import static android.telecom.Call.*;
 
 public class CallService extends InCallService {
@@ -85,7 +86,11 @@ public class CallService extends InCallService {
 
         intent.putParcelableArrayListExtra("SelectPA", data);
 */
-        startActivity(intent);
+
+
+        startActivity(intent.addFlags(
+                Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
 
         CallManager.INSTANCE.updateCall(call);
     }

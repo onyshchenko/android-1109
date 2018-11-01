@@ -54,12 +54,15 @@ import static android.telecom.Call.STATE_NEW;
 import static android.telecom.Call.STATE_RINGING;
 import static android.telecom.Call.STATE_SELECT_PHONE_ACCOUNT;
 
-
+/*
+        https://material.io/tools/icons/?icon=sync&style=sharp
+*/
 public class CallActivity extends AppCompatActivity {
 
     private TextView mtextDisplayName;
     private TextView mtextDuration;
     private TextView mtextStatus;
+    private ImageView mbuttonChange;
 
     private Timer mTimer;
     private MyTimerTask mMyTimerTask;
@@ -135,10 +138,22 @@ public class CallActivity extends AppCompatActivity {
             public void onFinishCallActivity() {
                 finish();
             }
+
+            @Override
+            public void onShowChangeCallButton() {
+                mbuttonChange.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onHideChangeCallButton() {
+                mbuttonChange.setVisibility(View.INVISIBLE);
+            }
         });
 
         ImageView buttonAnswer = findViewById(R.id.buttonAnswer);
         ImageView buttonHangup = findViewById(R.id.buttonHangup);
+        mbuttonChange = findViewById(R.id.buttonChange);
+        mbuttonChange.setVisibility(View.GONE);
 
         mtextDisplayName = findViewById(R.id.textDisplayName);
         mtextDuration = findViewById(R.id.textDuration);
@@ -182,30 +197,13 @@ public class CallActivity extends AppCompatActivity {
         });
 
 
+        mbuttonChange.setOnClickListener(new View.OnClickListener() {
 
-        /*
-        if (status == STATE_SELECT_PHONE_ACCOUNT) {
-
-            final PhoneAccountFragment fragment = PhoneAccountFragment.newInstance(mSelectPA, mPhoneNumber);
-            fragment.setActionListener(new PhoneAccountFragment.ActionListener() {
-
-                @Override
-                public void save(int position) {
-                    fragment.dismiss();
-                    CallManager.INSTANCE.acceptPhoneAccount(mSelectPA.get(position));
-                }
-
-                @Override
-                public void cancel() {
-                    //getSupportLoaderManager().initLoader(0, null, MainActivity.this);
-                    fragment.dismiss();
-                    CallManager.INSTANCE.cancelCall();
-                }
-            });
-
-            fragment.show(getSupportFragmentManager(), "dialog");
-        }
-        */
+            @Override
+            public void onClick(View v) {
+                CallManager.INSTANCE.changeCall(mСurrentCall);
+            }
+        });
     }
 
     @Override
