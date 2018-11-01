@@ -2,6 +2,8 @@ package com.example.onyshchenkov.simpledialer;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.KeyguardManager;
+import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -54,12 +56,15 @@ import static android.telecom.Call.STATE_NEW;
 import static android.telecom.Call.STATE_RINGING;
 import static android.telecom.Call.STATE_SELECT_PHONE_ACCOUNT;
 
-
+/*
+        https://material.io/tools/icons/?icon=sync&style=sharp
+*/
 public class CallActivity extends AppCompatActivity {
 
     private TextView mtextDisplayName;
     private TextView mtextDuration;
     private TextView mtextStatus;
+    private ImageView mbuttonChange;
 
     private Timer mTimer;
     private MyTimerTask mMyTimerTask;
@@ -76,7 +81,6 @@ public class CallActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); //запретип поворот экрана, при повороте телефона
-        setContentView(R.layout.activity_call);
 
         Log.d("CallActivity", "onCreate");
 
@@ -92,6 +96,7 @@ public class CallActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LOCAL_FOCUS_MODE);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -105,6 +110,16 @@ public class CallActivity extends AppCompatActivity {
         } else {
             setTurnScreenOn(true);
         }
+
+        WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+
+        setContentView(R.layout.activity_call);
+
+
+
+
 
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); //Window flag: as long as this window is visible to the user, keep the device's screen turned on and bright.
@@ -135,10 +150,22 @@ public class CallActivity extends AppCompatActivity {
             public void onFinishCallActivity() {
                 finish();
             }
+
+            @Override
+            public void onShowChangeCallButton() {
+                mbuttonChange.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onHideChangeCallButton() {
+                mbuttonChange.setVisibility(View.INVISIBLE);
+            }
         });
 
         ImageView buttonAnswer = findViewById(R.id.buttonAnswer);
         ImageView buttonHangup = findViewById(R.id.buttonHangup);
+        mbuttonChange = findViewById(R.id.buttonChange);
+        mbuttonChange.setVisibility(View.GONE);
 
         mtextDisplayName = findViewById(R.id.textDisplayName);
         mtextDuration = findViewById(R.id.textDuration);
@@ -182,32 +209,16 @@ public class CallActivity extends AppCompatActivity {
         });
 
 
+        mbuttonChange.setOnClickListener(new View.OnClickListener() {
 
-        /*
-        if (status == STATE_SELECT_PHONE_ACCOUNT) {
-
-            final PhoneAccountFragment fragment = PhoneAccountFragment.newInstance(mSelectPA, mPhoneNumber);
-            fragment.setActionListener(new PhoneAccountFragment.ActionListener() {
-
-                @Override
-                public void save(int position) {
-                    fragment.dismiss();
-                    CallManager.INSTANCE.acceptPhoneAccount(mSelectPA.get(position));
-                }
-
-                @Override
-                public void cancel() {
-                    //getSupportLoaderManager().initLoader(0, null, MainActivity.this);
-                    fragment.dismiss();
-                    CallManager.INSTANCE.cancelCall();
-                }
-            });
-
-            fragment.show(getSupportFragmentManager(), "dialog");
-        }
-        */
+            @Override
+            public void onClick(View v) {
+                CallManager.INSTANCE.changeCall(mСurrentCall);
+            }
+        });
     }
 
+    @SuppressLint("InvalidWakeLockTag")
     @Override
     protected void onNewIntent(Intent intent) {
         //super.onNewIntent(intent);
@@ -216,9 +227,13 @@ public class CallActivity extends AppCompatActivity {
         //mSelectPA = intent.getParcelableArrayListExtra("SelectPA");
 
         //CallManager.INSTANCE.getCurStatus();
+/*
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+*/
+        PowerManager powermanager=  ((PowerManager) getSystemService(Context.POWER_SERVICE));
+        powermanager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "tag").acquire();
 
-        //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     private String searchincontacts(String number) {

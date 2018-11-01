@@ -2,6 +2,7 @@ package com.example.onyshchenkov.simpledialer;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -25,7 +26,11 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
 import static android.telecom.Call.*;
+import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+import static android.view.WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED;
 
 public class CallService extends InCallService {
 
@@ -37,6 +42,7 @@ public class CallService extends InCallService {
     };
 
 
+    @SuppressLint("WrongConstant")
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onCallAdded(Call call) {
@@ -85,8 +91,20 @@ public class CallService extends InCallService {
 
         intent.putParcelableArrayListExtra("SelectPA", data);
 */
-        startActivity(intent);
 
+/*
+        startActivity(intent.addFlags(
+                Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(
+                Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+*/
+
+        startActivity(intent.addFlags(FLAG_ACTIVITY_NEW_TASK));
+
+/*
+        startActivity(intent.addFlags(
+                Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+*/
         CallManager.INSTANCE.updateCall(call);
     }
 
