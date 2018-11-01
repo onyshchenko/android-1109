@@ -12,7 +12,7 @@ import java.util.UUID;
 public class DataBaseHelper extends SQLiteOpenHelper {
 
     // Database Version
-    private final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 1;
 
     // Database Name
     private static final String DATABASE_NAME = "MicroCRM.db";
@@ -20,9 +20,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     // Tables Name
     private final String TABLE_INCOMING_CALL = "incoming_call";
     private final String TABLE_CUSTOMERS_STAT = "customers_stat";
-    private final String TABLE_CUSTOMER_ORDERS = "customer_orders";
-    private final String TABLE_LAST_CUSTOMER_ORDERS = "last_customer_orders";
     private final String TABLE_NUMBERS_CUSTOMERS = "numbers_customers";
+    private final String TABLE_CUSTOMER_ORDERS = "customer_orders";
+    private final String TABLE_ORDERS_DETAILS = "orders_details";
+    private final String TABLE_DELIVERY_ADDRESS = "delivery_address";
+
     private final String TABLE_CATEGORIES = "categories";
     private final String TABLE_SUB_CATEGORIES = "sub_categories";
     private final String TABLE_ITEMS = "items";
@@ -46,21 +48,21 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     // TABLE_CUSTOMERS_STAT
     //private final String COLUMN_ID = "_id";
     private final String COLUMN_SURNAME = "surname"; //фамилия
-    private final String COLUMN_NAME = "name";
-    private final String COLUMN_OLDNAME = "oldname";
-    private final String COLUMN_CITY = "city";
-    private final String COLUMN_PET = "pet";
+    private final String COLUMN_NAME = "name"; // Имя
+    private final String COLUMN_OLDNAME = "oldname"; // отчество
+    private final String COLUMN_CITY = "city"; // город
+    private final String COLUMN_PET = "pet";  // питомец
 
-    private final String COLUMN_CNT_ORDERS = "cnt_orders";
-    private final String COLUMN_FIRST_ORDER = "first_order";
-    private final String COLUMN_LAST_ORDER = "last_order";
-    private final String COLUMN_CITY = "city";
-    private final String COLUMN_CITY = "city";
-    private final String COLUMN_CITY = "city";
+    private final String COLUMN_CNT_ORDERS = "cnt_orders"; // всего заказов
+    private final String COLUMN_FIRST_ORDER = "first_order"; // дата перового заказа
+    private final String COLUMN_LAST_ORDER = "last_order"; // дата последнего заказа
+
+    private final String COLUMN_SUM_ALL = "sum_all"; // заработок на этом клиенте
+    private final String COLUMN_COMMENT = "cmmnt"; // комментарий
 
 
     // Table Create Statements
-    private static final String CREATE_TABLE_CUSTOMERS_STAT = "CREATE TABLE " + TABLE_CUSTOMERS_STAT + "(" +
+    private final String CREATE_TABLE_CUSTOMERS_STAT = "CREATE TABLE " + TABLE_CUSTOMERS_STAT + "(" +
             COLUMN_ID + " TEXT PRIMARY KEY," +
             COLUMN_SURNAME + " TEXT," +
             COLUMN_NAME + " TEXT," +
@@ -69,15 +71,92 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             COLUMN_PET + " TEXT," +
             COLUMN_CNT_ORDERS + " INTEGER," +
             COLUMN_FIRST_ORDER + " INTEGER," +
-            KEY_LAST_ORDER + " INTEGER," +
-            KEY_CNT_DAYS + " INTEGER," +
-            KEY_AVG_DAYS + " INTEGER," +
-            KEY_SUM_ALL + " NUMERIC," +
-            KEY_COMMENT + " TEXT)";
+            COLUMN_LAST_ORDER + " INTEGER," +
+            COLUMN_SUM_ALL + " NUMERIC," +
+            COLUMN_COMMENT + " TEXT)";
 
-    private static final String CREATE_TABLE_GROUPS = "CREATE TABLE " + TABLE_NAME_GROUPS + "("
-            + COLUMN_ID_GROUPS + " text primary key,"
-            + COLUMN_NAME_GROUPS + " text not null UNIQUE )";
+
+    // TABLE_NUMBERS_CUSTOMERS
+    //private final String COLUMN_ID = "_id";
+    private final String COLUMN_CLIENT_ID = "client_id"; // ИД клиента
+    private final String COLUMN_PHONE_NUMBER = "phone"; // номер телефона
+
+    private final String CREATE_TABLE_NUMBERS_CUSTOMERS = "CREATE TABLE " + TABLE_NUMBERS_CUSTOMERS + "(" +
+            COLUMN_ID + " TEXT PRIMARY KEY," +
+            COLUMN_CLIENT_ID + " TEXT," +
+            COLUMN_PHONE_NUMBER + " TEXT" +
+            ")";
+
+
+    //TABLE_CUSTOMER_ORDERS
+    //private final String COLUMN_ID = "_id";
+    //private final String COLUMN_CLIENT_ID = "client_id"; // ИД клиента
+    private final String COLUMN_TRANSPORT_ID = "transport_id"; // ИД записи о доставке
+
+    private final String CREATE_TABLE_CUSTOMER_ORDERS = "CREATE TABLE " + TABLE_CUSTOMER_ORDERS + "(" +
+            COLUMN_ID + " TEXT PRIMARY KEY," +
+            COLUMN_CLIENT_ID + " TEXT," +
+            COLUMN_TRANSPORT_ID + " TEXT" +
+            ")";
+
+
+    // TABLE_ORDERS_DETAILS
+    //private final String COLUMN_ID = "_id";
+    //private final String COLUMN_CLIENT_ID = "client_id"; // ИД клиента
+    private final String COLUMN_ORDER_ID = "order_id"; // ИД заказа
+    private final String COLUMN_ITEM_ID = "item_id"; // ИД товара
+    private final String COLUMN_CNT = "cnt"; // Количество
+    private final String COLUMN_SUMM = "summ"; // Сумма
+
+    private final String CREATE_TABLE_ORDERS_DETAILS = "CREATE TABLE " + TABLE_ORDERS_DETAILS + "(" +
+            COLUMN_ID + " TEXT PRIMARY KEY," +
+            COLUMN_ORDER_ID + " TEXT," +
+            COLUMN_ITEM_ID + " TEXT," +
+            COLUMN_CNT + " INTEGER," +
+            COLUMN_SUMM + " NUMERIC" +
+            ")";
+
+
+    // TABLE_ITEMS
+    //private final String COLUMN_ID = "_id";
+    private final String COLUMN_SUBCATEGORY_ID = "subcategory_id"; // ИД заказа
+
+
+    private final String CREATE_TABLE_ITEMS = "CREATE TABLE " + TABLE_ITEMS + "(" +
+            COLUMN_ID + " TEXT PRIMARY KEY," +
+            COLUMN_NAME + " TEXT," +
+            COLUMN_SUBCATEGORY_ID + " TEXT" +
+            ")";
+
+
+    // TABLE_SUB_CATEGORIES
+    //private final String COLUMN_ID = "_id";
+    private final String COLUMN_CATEGORY_ID = "category_id"; // ИД заказа
+
+
+    private final String CREATE_TABLE_SUB_CATEGORIES = "CREATE TABLE " + TABLE_SUB_CATEGORIES + "(" +
+            COLUMN_ID + " TEXT PRIMARY KEY," +
+            COLUMN_NAME + " TEXT," +
+            COLUMN_CATEGORY_ID + " TEXT" +
+            ")";
+
+
+    // TABLE_CATEGORIES
+    //private final String COLUMN_ID = "_id";
+
+    private final String CREATE_TABLE_CATEGORIES = "CREATE TABLE " + TABLE_CATEGORIES + "(" +
+            COLUMN_ID + " TEXT PRIMARY KEY," +
+            COLUMN_NAME + " TEXT" +
+            ")";
+
+
+    // TABLE_DELIVERY_ADDRESS
+    //private final String COLUMN_ID = "_id";
+
+    private final String CREATE_TABLE_DELIVERY_ADDRESS = "CREATE TABLE " + TABLE_DELIVERY_ADDRESS + "(" +
+            COLUMN_ID + " TEXT PRIMARY KEY," +
+            COLUMN_NAME + " TEXT" +
+            ")";
 
 
     public DataBaseHelper(Context context) {
@@ -87,14 +166,27 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_INCOMING_CALL);
-        db.execSQL(CREATE_TABLE_GROUPS);
+        db.execSQL(CREATE_TABLE_CUSTOMERS_STAT);
+        db.execSQL(CREATE_TABLE_NUMBERS_CUSTOMERS);
+        db.execSQL(CREATE_TABLE_CUSTOMER_ORDERS);
+        db.execSQL(CREATE_TABLE_ORDERS_DETAILS);
+        db.execSQL(CREATE_TABLE_ITEMS);
+        db.execSQL(CREATE_TABLE_SUB_CATEGORIES);
+        db.execSQL(CREATE_TABLE_DELIVERY_ADDRESS);
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         // on upgrade drop older tables
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_INCOMING_CALL);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_CUSTOMERS_STAT);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NUMBERS_CUSTOMERS);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_CUSTOMER_ORDERS);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDERS_DETAILS);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_SUB_CATEGORIES);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEMS);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_DELIVERY_ADDRESS);
         // create new tables
         onCreate(sqLiteDatabase);
     }
@@ -104,116 +196,36 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         // on upgrade drop older tables
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_INCOMING_CALL);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_CUSTOMERS_STAT);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NUMBERS_CUSTOMERS);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_CUSTOMER_ORDERS);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDERS_DETAILS);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_SUB_CATEGORIES);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEMS);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_DELIVERY_ADDRESS);
         // create new tables
         onCreate(sqLiteDatabase);
     }
 
-    public String insert_student(Student student, String group_name, String group_uuid) {
-        long id = 0;
-        String str_uuid_group = "";
-        String str_uuid = UUID.randomUUID().toString();
-        ;
-        SQLiteDatabase db = getWritableDatabase();
-
-        try {
-            if (group_uuid.equals("")) {
-                str_uuid_group = getGroupId(group_name);
-                if (str_uuid_group == "") {
-                    //Log.d("update_student", "getGroupId " + id);
-                    // такой группы еще нет
-                    str_uuid_group = insertGroup(group_name, "");
-                }
-            } else {
-                str_uuid_group = group_uuid;
-            }
-            // Такая группа уже существует
-            ContentValues values = new ContentValues();
-            values.put(COLUMN_ID_STUDENTS, str_uuid);
-            values.put(COLUMN_GROUPID_STUDENTS, str_uuid_group);
-            values.put(COLUMN_FIRSTNAME_STUDENTS, student.FirstName);
-            values.put(COLUMN_LASTNAME_STUDENTS, student.LastName);
-            values.put(COLUMN_AGE_STUDENTS, student.Age);
-
-            id = db.insert(TABLE_NAME_STUDENTS, null, values);
-
-        } catch (Exception e) {
-            str_uuid = "";
-            e.printStackTrace();
-        }
-        return str_uuid;
-    }
-
-    public int update_student(Student student) {
-        //long id = 0;
-        int cnt_rows = 0;
-        String str_uuid = "";
-        SQLiteDatabase db = getWritableDatabase();
-
-        try {
-
-            str_uuid = getGroupId(student.GroupName);
-            if (str_uuid == "") {
-                //Log.d("update_student", "getGroupId " + id);
-                // такой группы еще нет
-                str_uuid = insertGroup(student.GroupName, "");
-            }
-            // Такая группа уже существует
-
-            ContentValues values = new ContentValues();
-            values.put(COLUMN_FIRSTNAME_STUDENTS, student.FirstName);
-            values.put(COLUMN_LASTNAME_STUDENTS, student.LastName);
-            values.put(COLUMN_AGE_STUDENTS, student.Age);
-            values.put(COLUMN_GROUPID_STUDENTS, str_uuid);
-
-            //Log.d("update_student", "student.id " + student.id);
-
-            // updating row
-            cnt_rows = db.update(TABLE_NAME_STUDENTS, values, COLUMN_ID_STUDENTS + " = '" + student.id + "'", null);
-            //Log.d("update_student", "cnt_rows " + cnt_rows);
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return cnt_rows;
-    }
-
-    public ArrayList<Student> getStudents() {
-        ArrayList<Student> students = new ArrayList<>();
+    public String getClientId(String str_phone_number){
+        String clientid = "";
         Cursor cursor = null;
-        SQLiteDatabase db = getWritableDatabase();
-/*
-        String[] arr_column = {
-                COLUMN_ID_STUDENTS,
-                COLUMN_NAME_GROUPS,
-                COLUMN_FIRSTNAME_STUDENTS,
-                COLUMN_LASTNAME_STUDENTS,
-                COLUMN_AGE_STUDENTS
-        };
-*/
+        SQLiteDatabase db = getReadableDatabase();
+
         try {
-            //cursor = db.query(TABLE_NAME_STUDENTS, arr_column, null, null, null, null, null, null);
-            String strSQL = "Select t1." + COLUMN_ID_STUDENTS + ", t1." + COLUMN_GROUPID_STUDENTS + ", t2." + COLUMN_NAME_GROUPS + ", t1." + COLUMN_FIRSTNAME_STUDENTS + ", t1." + COLUMN_LASTNAME_STUDENTS + ", t1." + COLUMN_AGE_STUDENTS
-                    + " from " + TABLE_NAME_STUDENTS + " t1  left join " + TABLE_NAME_GROUPS + " t2 on t1." + COLUMN_GROUPID_STUDENTS + " = t2." + COLUMN_ID_GROUPS;
+
+            String strSQL = "Select t1." + COLUMN_CLIENT_ID +
+                    " from " + TABLE_NUMBERS_CUSTOMERS + " t1" +
+                    " where " + COLUMN_PHONE_NUMBER + " = " + str_phone_number;
+
 
             cursor = db.rawQuery(strSQL, null);
 
             if (cursor.moveToFirst()) {
                 while (!cursor.isAfterLast()) {
-                    Student student = new Student();
-                    student.id =
-                            cursor.getString(cursor.getColumnIndex(COLUMN_ID_STUDENTS));
-                    student.GroupId =
-                            cursor.getString(cursor.getColumnIndex(COLUMN_GROUPID_STUDENTS));
-                    student.GroupName =
-                            cursor.getString(cursor.getColumnIndex(COLUMN_NAME_GROUPS));
-                    student.FirstName =
-                            cursor.getString(cursor.getColumnIndex(COLUMN_FIRSTNAME_STUDENTS));
-                    student.LastName =
-                            cursor.getString(cursor.getColumnIndex(COLUMN_LASTNAME_STUDENTS));
-                    student.Age =
-                            cursor.getInt(cursor.getColumnIndex(COLUMN_AGE_STUDENTS));
-                    students.add(student);
+
+                    clientid = cursor.getString(cursor.getColumnIndex(COLUMN_CLIENT_ID));
+
                     cursor.moveToNext();
                 }
             }
@@ -225,126 +237,17 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 cursor.close();
             }
         }
-        return students;
+
+        return clientid;
     }
 
     /*
-        public Cursor getStudentsAndGroups() {
-            //ArrayList<Student> students = new ArrayList<>();
-            //Cursor cursor = null;
-            SQLiteDatabase db = getWritableDatabase();
 
-            try {
-                //MainActivity.mstudentsCursor = db.query(TABLE_NAME_STUDENTS, arr_column,null,null,null,null,null, null);
+    TABLE_NUMBERS_CUSTOMERS + "(" +
+            COLUMN_ID + " TEXT PRIMARY KEY," +
+            COLUMN_CLIENT_ID + " TEXT," +
+            COLUMN_PHONE_NUMBER + " TEXT" +
+            ")";
 
-                String strSQL = "Select t1." + COLUMN_ID_STUDENTS + ", t1." + COLUMN_GROUPID_STUDENTS + ", t2." + COLUMN_NAME_GROUPS + ", t1." + COLUMN_FIRSTNAME_STUDENTS + ", t1." + COLUMN_LASTNAME_STUDENTS + ", t1." + COLUMN_AGE_STUDENTS
-                        + " from " + TABLE_NAME_STUDENTS + " t1  left join " + TABLE_NAME_GROUPS + " t2 on t1." + COLUMN_GROUPID_STUDENTS + " = t2." + COLUMN_ID_GROUPS;
-
-                MainActivity.mstudentsCursor = db.rawQuery(strSQL, null);
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                MainActivity.mstudentsCursor = null;
-            }
-
-            return MainActivity.mstudentsCursor;
-        }
-    */
-    public String insertGroup(String group, String str_uuid) {
-        long id = 0;
-        SQLiteDatabase db = getWritableDatabase();
-
-        if (str_uuid.equals("")) {
-            str_uuid = UUID.randomUUID().toString();
-        }
-        //String str_uuid = UUID.randomUUID().toString();
-
-        try {
-            ContentValues values = new ContentValues();
-
-            values.put(COLUMN_NAME_GROUPS, group);
-            values.put(COLUMN_ID_GROUPS, str_uuid);
-
-            id = db.insert(TABLE_NAME_GROUPS, null, values);
-        } catch (Exception e) {
-            str_uuid = "";
-            e.printStackTrace();
-        }
-        return str_uuid;
-    }
-
-    public String getGroupId(String group) {
-        //long id = 0;
-        SQLiteDatabase db = getWritableDatabase();
-        Cursor cursor = null;
-        String str_uuid = "";
-
-        try {
-            String strSQL = "Select " + COLUMN_ID_GROUPS
-                    + " from " + TABLE_NAME_GROUPS + " where " + COLUMN_NAME_GROUPS + " = '" + group + "'";
-
-            //Log.d("getGroupId", "strSQL " + strSQL);
-
-            cursor = db.rawQuery(strSQL, null);
-            if (cursor.moveToFirst()) {
-                str_uuid = cursor.getString(cursor.getColumnIndex(COLUMN_ID_GROUPS));
-                //Log.d("getGroupId", "id " + id);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        return str_uuid;
-    }
-
-    public ArrayList<Group> getGroups() {
-        //long id = 0;
-        ArrayList<Group> groups = new ArrayList<>();
-        SQLiteDatabase db = getWritableDatabase();
-        Cursor cursor = null;
-        //String str_uuid = "";
-
-        try {
-            String strSQL = "Select " + COLUMN_ID_GROUPS + ", "
-                    + COLUMN_NAME_GROUPS
-                    + " from " + TABLE_NAME_GROUPS;
-
-            //Log.d("getGroupId", "strSQL " + strSQL);
-
-            cursor = db.rawQuery(strSQL, null);
-            if (cursor.moveToFirst()) {
-                while (!cursor.isAfterLast()) {
-                    Group group = new Group();
-                    group.groupId = cursor.getString(cursor.getColumnIndex(COLUMN_ID_GROUPS));
-                    group.groupName = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_GROUPS));
-                    groups.add(group);
-                    cursor.moveToNext();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        return groups;
-    }
-
-    public int deleteStudent(String str_uuid) {
-        int count = 0;
-        SQLiteDatabase db = getWritableDatabase();
-
-        try {
-            count = db.delete(TABLE_NAME_STUDENTS, COLUMN_ID_STUDENTS + " = '" + str_uuid + "'", null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return count;
-    }
+     */
 }

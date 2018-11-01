@@ -10,6 +10,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
@@ -55,6 +57,17 @@ public class PhoneAccountFragment extends DialogFragment {
     }
 
     @Override
+    public void show(FragmentManager manager, String tag) {
+        try {
+            FragmentTransaction ft = manager.beginTransaction();
+            ft.add(this, tag);
+            ft.commit();
+        } catch (IllegalStateException e) {
+            Log.d("MicroCRM", "Exception", e);
+        }
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -64,6 +77,9 @@ public class PhoneAccountFragment extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        Log.d("MicroCRM", "PhoneAccountFragment. onCreateView");
+
 
         View view = inflater.inflate(R.layout.fragment_phone_account, container, false);
 
@@ -103,22 +119,8 @@ public class PhoneAccountFragment extends DialogFragment {
         }
     };
 
-/*
-    private View.OnClickListener cancelListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (mListener != null) {
-                mListener.cancel();
-            }
-        }
-    };
-*/
     private void init() {
 
-        /*
-            String label = phoneAccount.getLabel().toString();
-            Icon icon = phoneAccount.getIcon();
- */
         String[] str = new String [mPhoneAccounts.size()];
         for(int i=0; i<mPhoneAccounts.size(); i++){
             str[i] = mPhoneAccounts.get(i).name;

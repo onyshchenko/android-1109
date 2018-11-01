@@ -1,51 +1,36 @@
 package com.example.onyshchenkov.simpledialer;
 
 
-import android.Manifest;
-import android.content.ComponentName;
-import android.content.Context;
+import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
 import android.telecom.Call;
-import android.telecom.CallAudioState;
 import android.telecom.InCallService;
-import android.telecom.PhoneAccount;
-import android.telecom.PhoneAccountHandle;
-import android.telecom.TelecomManager;
-import android.telecom.VideoProfile;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
+
 import static android.telecom.Call.*;
 
 public class CallService extends InCallService {
 
     private Call.Callback callCallback = new Callback() {
         public void onStateChanged(Call call, int state) {
-            //Log.d("CallService", "Call.Callback onStateChanged: " + call + ", state: " + state);
+            Log.d("MicroCRM", "Call.Callback onStateChanged: " + call + ", state: " + state);
             CallManager.INSTANCE.updateCall(call);
         }
     };
 
 
+    //@SuppressLint("WrongConstant")
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onCallAdded(Call call) {
         super.onCallAdded(call);
 
-        //int debug = 1;
 
-        Log.d("CallService", "onCallAdded");
+        Log.d("MicroCRM", "onCallAdded");
 
         call.registerCallback(callCallback);
 
@@ -87,11 +72,25 @@ public class CallService extends InCallService {
         intent.putParcelableArrayListExtra("SelectPA", data);
 */
 
-
+/*
         startActivity(intent.addFlags(
                 Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(
                 Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+*/
 
+/*
+        startActivity(intent.addFlags(
+                Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(
+                Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+*/
+
+        startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+
+/*
+        startActivity(intent.addFlags(
+                Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+*/
         CallManager.INSTANCE.updateCall(call);
     }
 
@@ -99,7 +98,7 @@ public class CallService extends InCallService {
     @Override
     public void onCallRemoved(Call call) {
         super.onCallRemoved(call);
-        //Log.d("CallService", "onCallRemoved");
+        Log.d("MicroCRM", "onCallRemoved");
 
         call.unregisterCallback(callCallback);
         CallManager.INSTANCE.updateCall(null);

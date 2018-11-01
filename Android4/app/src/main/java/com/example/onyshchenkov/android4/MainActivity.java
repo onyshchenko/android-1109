@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
             }
                 break;
             case R.id.button5:
+                finish();
                 break;
             case R.id.button6:
                 break;

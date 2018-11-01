@@ -41,15 +41,10 @@ public class CallManager {
         this.listener = listener;
     }
 
-    /*
-    public void updateCall(Call call) {
-        updateCall(call, new ArrayList<SelectPA>());
-    }
-*/
 
-    public void updateCall(Call call /*, ArrayList<SelectPA> data*/) {
+    public void updateCall(Call call ) {
 
-        Log.d("CallManager", "Call.Callback onStateChanged: " + call);
+        Log.d("MicroCRM", "CallManager. updateCall: " + call);
         if (call != null) {
 
             int hashCode = call.getDetails().hashCode();
@@ -64,17 +59,20 @@ public class CallManager {
                 }
                 if (!compare_hash) {
                     mCall.add(call);
+                    Log.d("MicroCRM", "CallManager. Add Call. Call count: " + mCall.size());
                 }
             } else if (call.getState() == STATE_DISCONNECTED) {
 
                 for (int i = 0; i < mCall.size(); i++) {
                     if (mCall.get(i).getDetails().hashCode() == hashCode) {
                         mCall.remove(i);
+                        Log.d("MicroCRM", "CallManager. Call Removed. Call count: " + mCall.size());
                     }
                 }
 
                 if (mCall.size() == 0) {
                     if (listener != null) {
+                        Log.d("MicroCRM", "CallManager. Activity finish. Call count: " + mCall.size());
                         listener.onFinishCallActivity();
                     }
                 }
@@ -102,7 +100,7 @@ public class CallManager {
 
 
     public void acceptPhoneAccount(Call call, PhoneAccountHandle data) {
-        //Log.d("CallManager", "acceptPhoneAccount");
+        Log.d("MicroCRM", "CallManager. acceptPhoneAccount");
 
         if (call != null) {
             call.phoneAccountSelected(data, false);
@@ -138,7 +136,7 @@ public class CallManager {
 */
     }
 
-    public final void getCurStatus(Call call) {
+    public void getCurStatus(Call call) {
 
         if (call != null) {
             if (listener != null) {
@@ -152,7 +150,7 @@ public class CallManager {
     }
 
     public void acceptCall(Call call) {
-        //Log.d("CallManager", "acceptCall");
+        Log.d("MicroCRM", "CallManager. acceptCall");
 
         if (call != null) {
             call.answer(call.getDetails().getVideoState());

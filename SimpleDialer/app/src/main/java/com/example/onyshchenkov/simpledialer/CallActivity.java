@@ -2,6 +2,8 @@ package com.example.onyshchenkov.simpledialer;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.KeyguardManager;
+import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -79,9 +81,8 @@ public class CallActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); //запретип поворот экрана, при повороте телефона
-        setContentView(R.layout.activity_call);
 
-        Log.d("CallActivity", "onCreate");
+        Log.d("MicroCRM", "CallActivity. onCreate");
 
         //mCall = new ArrayList<Call>();
 
@@ -95,6 +96,7 @@ public class CallActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LOCAL_FOCUS_MODE);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -108,6 +110,16 @@ public class CallActivity extends AppCompatActivity {
         } else {
             setTurnScreenOn(true);
         }
+
+        WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+
+        setContentView(R.layout.activity_call);
+
+
+
+
 
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); //Window flag: as long as this window is visible to the user, keep the device's screen turned on and bright.
@@ -136,7 +148,7 @@ public class CallActivity extends AppCompatActivity {
 
             @Override
             public void onFinishCallActivity() {
-                finish();
+                FinishCallActivity();
             }
 
             @Override
@@ -177,9 +189,7 @@ public class CallActivity extends AppCompatActivity {
         buttonAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //findViewById(R.id.buttonAnswer).setEnabled(false);
-
-                Log.d("CallActivity", "onClick_green");
+                Log.d("MicroCRM", "CallActivity. onClick_green");
 
                 CallManager.INSTANCE.acceptCall(mСurrentCall);
             }
@@ -188,9 +198,7 @@ public class CallActivity extends AppCompatActivity {
         buttonHangup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //findViewById(R.id.buttonHangup).setEnabled(false);
-                //findViewById(R.id.buttonAnswer).setEnabled(false);
-                Log.d("CallActivity", "onClick_red");
+                Log.d("MicroCRM", "CallActivity. onClick_red");
 
                 CallManager.INSTANCE.cancelCall(mСurrentCall);
             }
@@ -201,11 +209,13 @@ public class CallActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
+                Log.d("MicroCRM", "CallActivity. OnClick_grey");
                 CallManager.INSTANCE.changeCall(mСurrentCall);
             }
         });
     }
 
+    @SuppressLint("InvalidWakeLockTag")
     @Override
     protected void onNewIntent(Intent intent) {
         //super.onNewIntent(intent);
@@ -214,9 +224,14 @@ public class CallActivity extends AppCompatActivity {
         //mSelectPA = intent.getParcelableArrayListExtra("SelectPA");
 
         //CallManager.INSTANCE.getCurStatus();
+/*
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+*/
+        Log.d("MicroCRM", "CallActivity. onNewIntent");
+        PowerManager powermanager=  ((PowerManager) getSystemService(Context.POWER_SERVICE));
+        powermanager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "tag").acquire();
 
-        //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     private String searchincontacts(String number) {
@@ -250,7 +265,7 @@ public class CallActivity extends AppCompatActivity {
     }
 
     public void updateView(Call call) {
-        Log.d("CallActivity", "Call onStateChanged: " + call.getState());
+        Log.d("MicroCRM", "CallActivity. updateView: " + call.getState());
 
         switch (call.getState()) {
             case STATE_ACTIVE: {
@@ -366,12 +381,14 @@ public class CallActivity extends AppCompatActivity {
             mTimer.purge();
             mTimer = null;
         }
+        Log.d("MicroCRM", "CallActivity. onDestroy");
     }
-    /*
-    public void onFinishCallActivity(){
+
+    private void FinishCallActivity(){
         finish();
+        Log.d("MicroCRM", "CallActivity. FinishCallActivity");
     }
-    */
+
 
     class MyTimerTask extends TimerTask {
 
