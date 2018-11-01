@@ -1,36 +1,17 @@
 package com.example.onyshchenkov.simpledialer;
 
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
 import android.telecom.Call;
-import android.telecom.CallAudioState;
 import android.telecom.InCallService;
-import android.telecom.PhoneAccount;
-import android.telecom.PhoneAccountHandle;
-import android.telecom.TelecomManager;
-import android.telecom.VideoProfile;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
+
 import static android.telecom.Call.*;
-import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
-import static android.view.WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED;
 
 public class CallService extends InCallService {
 
@@ -95,10 +76,16 @@ public class CallService extends InCallService {
 /*
         startActivity(intent.addFlags(
                 Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+*/
+
+/*
+        startActivity(intent.addFlags(
+                Intent.FLAG_ACTIVITY_CLEAR_TASK).addFlags(
                 Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
 */
 
-        startActivity(intent.addFlags(FLAG_ACTIVITY_NEW_TASK));
+        startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 
 /*
         startActivity(intent.addFlags(
