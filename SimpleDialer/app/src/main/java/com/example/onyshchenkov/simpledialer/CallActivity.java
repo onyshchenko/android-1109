@@ -2,6 +2,8 @@ package com.example.onyshchenkov.simpledialer;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.KeyguardManager;
+import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -79,7 +81,6 @@ public class CallActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); //запретип поворот экрана, при повороте телефона
-        setContentView(R.layout.activity_call);
 
         Log.d("CallActivity", "onCreate");
 
@@ -95,6 +96,7 @@ public class CallActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LOCAL_FOCUS_MODE);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -108,6 +110,16 @@ public class CallActivity extends AppCompatActivity {
         } else {
             setTurnScreenOn(true);
         }
+
+        WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+
+        setContentView(R.layout.activity_call);
+
+
+
+
 
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); //Window flag: as long as this window is visible to the user, keep the device's screen turned on and bright.
@@ -206,6 +218,7 @@ public class CallActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("InvalidWakeLockTag")
     @Override
     protected void onNewIntent(Intent intent) {
         //super.onNewIntent(intent);
@@ -214,9 +227,13 @@ public class CallActivity extends AppCompatActivity {
         //mSelectPA = intent.getParcelableArrayListExtra("SelectPA");
 
         //CallManager.INSTANCE.getCurStatus();
+/*
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+*/
+        PowerManager powermanager=  ((PowerManager) getSystemService(Context.POWER_SERVICE));
+        powermanager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "tag").acquire();
 
-        //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     private String searchincontacts(String number) {
