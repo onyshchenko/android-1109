@@ -242,7 +242,7 @@ public class CallActivity extends AppCompatActivity {
 
     }
 
-    private String searchincontacts(String number) {
+    private String SearchInContacts(String number) {
 
         String DISPLAY_NAME = number;
 
@@ -444,8 +444,11 @@ public class CallActivity extends AppCompatActivity {
                     client_id = helper.getClientId(strings[1]);
                     if (client_id == "") {
                         //не клиент, проверить контакты
+                        //mtextDisplayName.setText(SearchInContacts(strings[1]));
+
                     } else {
                         //клиент - получить и показать инфу
+                        //mtextDisplayName.setText("It's our clients");
                     }
                     break;
             }
@@ -461,12 +464,14 @@ public class CallActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
         }
 
         @Override
         protected void onProgressUpdate(Void... values) {
             super.onProgressUpdate(values);
         }
+
     }
 
 }
