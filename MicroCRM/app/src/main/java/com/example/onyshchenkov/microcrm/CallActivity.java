@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import static android.telecom.Call.STATE_ACTIVE;
 import static android.telecom.Call.STATE_CONNECTING;
@@ -52,7 +53,7 @@ public class CallActivity extends AppCompatActivity {
     private Timer mTimer;
     private MyTimerTask mMyTimerTask;
     private Call mСurrentCall = null;
-    private Work_with_DB mtask = null;
+    private ArrayList<Work_with_DB> listtasks = null;
 
     private boolean mPendingShowDialog = false;
 
@@ -100,10 +101,6 @@ public class CallActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 
         setContentView(R.layout.activity_call);
-
-
-
-
 
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); //Window flag: as long as this window is visible to the user, keep the device's screen turned on and bright.
@@ -170,9 +167,6 @@ public class CallActivity extends AppCompatActivity {
         mMyTimerTask = new MyTimerTask();
         mTimer.schedule(mMyTimerTask, 1000, 1000);
 
-        //Запустить AsyncTask
-        mtask = new Work_with_DB();
-
         buttonAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -221,11 +215,37 @@ public class CallActivity extends AppCompatActivity {
 
     }
 
-    private void show_info(String number){
+    private void show_info(String number) {
 
-        AsyncTask.Status status = mtask.getStatus();
+        if (listtasks == null){
+            listtasks = new ArrayList();
+        }
 
-        mtask.execute("show client", number);
+        Work_with_DB task = new Work_with_DB();
+
+        task.execute("show client", number);
+        listtasks.add(task);
+
+        /*
+
+        if (mtask == null || mtask.getStatus() == AsyncTask.Status.FINISHED){
+            //Запустить AsyncTask
+            mtask = new Work_with_DB();
+        }
+
+        while (mtask.getStatus() == AsyncTask.Status.RUNNING) {
+            try {
+                TimeUnit.MILLISECONDS.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (mtask.getStatus() == AsyncTask.Status.PENDING) {
+
+*/
+
+
         /*
         DataBaseHelper helper;
 
@@ -410,9 +430,16 @@ public class CallActivity extends AppCompatActivity {
             mTimer = null;
         }
 
-        if (mtask != null) {
-            mtask.cancel(true);
+        if (listtasks != null) {
+            for (int i = 0; i < listtasks.size(); i++) {
+                if (!listtasks.get(i).isCancelled()){
+                    listtasks.get(i).cancel(true);
+                }
+            }
         }
+
+        CallManager.INSTANCE.setCustomObjectListener(null);
+
         Log.d("MicroCRM", "CallActivity. onDestroy");
     }
 
@@ -440,7 +467,6 @@ public class CallActivity extends AppCompatActivity {
                             call_duration = (call_duration - mСurrentCall.getDetails().getConnectTimeMillis()) / 1000;
 
                             mtextDuration.setText(String.format("%02d:%02d:%02d", call_duration / 3600, (call_duration % 3600) / 60, (call_duration % 60)));
-                            //String.format("%02d:%02d:%02d", call_duration / 3600, (call_duration % 3600) / 60, (call_duration % 60));
                         }
                     }
                     else {
@@ -470,13 +496,10 @@ public class CallActivity extends AppCompatActivity {
                         //не клиент, проверить контакты
                         ret_list.add("not_client");
                         ret_list.add(SearchInContacts(strings[1]));
-                        //mtextDisplayName.setText(SearchInContacts(strings[1]));
-
                     } else {
                         //клиент - получить и показать инфу
                         ret_list.add("client");
                         ret_list.add("It's our clients");
-                        //mtextDisplayName.setText("It's our clients");
                     }
                     break;
             }

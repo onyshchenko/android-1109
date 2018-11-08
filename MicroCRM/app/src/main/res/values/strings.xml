@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MicroCRM</string>
+
+    <string name="action_setting">Настройки</string>
+    <string name="action_find">Поиск по номеру</string>
+    <string name="action_get_from_server">Загрузить</string>
 </resources>

@@ -241,13 +241,39 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return clientid;
     }
 
-    /*
+    public String getClientInfo(String str_clientid){
+        String clientid = "";
+        Cursor cursor = null;
+        SQLiteDatabase db = getReadableDatabase();
 
-    TABLE_NUMBERS_CUSTOMERS + "(" +
-            COLUMN_ID + " TEXT PRIMARY KEY," +
-            COLUMN_CLIENT_ID + " TEXT," +
-            COLUMN_PHONE_NUMBER + " TEXT" +
-            ")";
+        try {
 
-     */
+            String strSQL = "Select t1." + COLUMN_CLIENT_ID +
+                    " from " + TABLE_NUMBERS_CUSTOMERS + " t1" +
+                    " where " + COLUMN_PHONE_NUMBER + " = " + str_clientid;
+
+
+            cursor = db.rawQuery(strSQL, null);
+
+            if (cursor.moveToFirst()) {
+                while (!cursor.isAfterLast()) {
+
+                    clientid = cursor.getString(cursor.getColumnIndex(COLUMN_CLIENT_ID));
+
+                    cursor.moveToNext();
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return clientid;
+    }
+
+
 }
