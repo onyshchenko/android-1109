@@ -33,6 +33,7 @@ public class CallService extends InCallService {
 
         Intent intent = new Intent(this, CallActivity.class);
         startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        //startActivity(intent);
 
         CallManager.INSTANCE.updateCall(call);
     }

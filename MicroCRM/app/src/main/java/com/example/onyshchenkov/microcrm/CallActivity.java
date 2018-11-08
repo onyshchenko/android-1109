@@ -21,6 +21,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,7 +52,7 @@ public class CallActivity extends AppCompatActivity {
     private Timer mTimer;
     private MyTimerTask mMyTimerTask;
     private Call mСurrentCall = null;
-    private Work_with_DB mtask;
+    private Work_with_DB mtask = null;
 
     private boolean mPendingShowDialog = false;
 
@@ -222,6 +223,8 @@ public class CallActivity extends AppCompatActivity {
 
     private void show_info(String number){
 
+        AsyncTask.Status status = mtask.getStatus();
+
         mtask.execute("show client", number);
         /*
         DataBaseHelper helper;
@@ -375,12 +378,26 @@ public class CallActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d("MicroCRM", "CallActivity. onResume");
         CallManager.INSTANCE.getCurStatus(mСurrentCall);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d("MicroCRM", "CallActivity. onPause");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("MicroCRM", "CallActivity. onStart");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("MicroCRM", "CallActivity. onStop");
     }
 
     @Override
@@ -391,6 +408,10 @@ public class CallActivity extends AppCompatActivity {
             mTimer.cancel();
             mTimer.purge();
             mTimer = null;
+        }
+
+        if (mtask != null) {
+            mtask.cancel(true);
         }
         Log.d("MicroCRM", "CallActivity. onDestroy");
     }
@@ -430,13 +451,16 @@ public class CallActivity extends AppCompatActivity {
         }
     }
 
-    private class Work_with_DB extends AsyncTask<String, Void, Void> {
+    private class Work_with_DB extends AsyncTask<String, Void, ArrayList<String>> {
 
         private DataBaseHelper helper;
+        ArrayList<String> ret_list = new ArrayList<>();
 
         @Override
-        protected Void doInBackground(String... strings) {
+        protected ArrayList<String> doInBackground(String... strings) {
             helper = new DataBaseHelper(CallActivity.this);
+
+            ret_list.add(strings[0]);
 
             switch (strings[0]) {
                 case "show client":
@@ -444,32 +468,41 @@ public class CallActivity extends AppCompatActivity {
                     client_id = helper.getClientId(strings[1]);
                     if (client_id == "") {
                         //не клиент, проверить контакты
+                        ret_list.add("not_client");
+                        ret_list.add(SearchInContacts(strings[1]));
                         //mtextDisplayName.setText(SearchInContacts(strings[1]));
 
                     } else {
                         //клиент - получить и показать инфу
+                        ret_list.add("client");
+                        ret_list.add("It's our clients");
                         //mtextDisplayName.setText("It's our clients");
                     }
                     break;
             }
             //strings.length
-            return null;
+            return ret_list;
         }
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
+        protected void onPostExecute(ArrayList<String> strings) {
+            super.onPostExecute(strings);
 
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
+            switch (strings.get(0)) {
+                case "show client":
+                    if (strings.get(1).equals("not_client")) {
+                        mtextDisplayName.setText(strings.get(2));
+                    } else {
+                        mtextDisplayName.setText(strings.get(2));
+                    }
+                    break;
+            }
+/*
+            for (int i = 0; i < strings.size(); i++ ) {
+                Toast.makeText(CallActivity.this, strings.get(i), Toast.LENGTH_LONG).show();
+            }
+*/
 
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
         }
 
     }
