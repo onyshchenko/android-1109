@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
@@ -73,7 +74,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             COLUMN_FIRST_ORDER + " INTEGER," +
             COLUMN_LAST_ORDER + " INTEGER," +
             COLUMN_SUM_ALL + " NUMERIC," +
-            COLUMN_COMMENT + " TEXT)";
+            COLUMN_COMMENT + " TEXT" +
+            ")";
 
 
     // TABLE_NUMBERS_CUSTOMERS
@@ -96,7 +98,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private final String CREATE_TABLE_CUSTOMER_ORDERS = "CREATE TABLE " + TABLE_CUSTOMER_ORDERS + "(" +
             COLUMN_ID + " TEXT PRIMARY KEY," +
             COLUMN_CLIENT_ID + " TEXT," +
-            COLUMN_TRANSPORT_ID + " TEXT" +
+            COLUMN_TRANSPORT_ID + " TEXT," +
+            COLUMN_CREATED_ACTION + " INTEGER" +
             ")";
 
 
@@ -172,8 +175,154 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_ORDERS_DETAILS);
         db.execSQL(CREATE_TABLE_ITEMS);
         db.execSQL(CREATE_TABLE_SUB_CATEGORIES);
+        db.execSQL(CREATE_TABLE_CATEGORIES);
         db.execSQL(CREATE_TABLE_DELIVERY_ADDRESS);
+
+        //init_db(db);
     }
+
+    private void init_db(SQLiteDatabase db){
+        String client_id = "",
+                phone_id = "",
+                in_call_id = "",
+                category_id = "",
+                sub_category_id = "",
+                item_id = "",
+                delivery_id = "",
+                order_id = "",
+                order_det_id = "";
+
+        long id;
+
+        try {
+
+            ContentValues values = new ContentValues();
+            client_id = UUID.randomUUID().toString();
+            values.put(COLUMN_ID, client_id);
+            values.put(COLUMN_SURNAME, "Иванов");
+            values.put(COLUMN_NAME, "Никита");
+            values.put(COLUMN_CITY, "Киев");
+            values.put(COLUMN_CNT_ORDERS, 4);
+            values.put(COLUMN_FIRST_ORDER, (new Date()).getTime()-(86400 * 5)); ////
+            values.put(COLUMN_LAST_ORDER, (new Date()).getTime()); ///long call_duration = (new Date()).getTime();
+            values.put(COLUMN_SUM_ALL, 4453);
+            values.put(COLUMN_COMMENT, "любит \"жаловаться\" на жизнь");
+
+
+            id = db.insert(TABLE_CUSTOMERS_STAT, null, values);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            ContentValues values = new ContentValues();
+            phone_id = UUID.randomUUID().toString();
+            values.put(COLUMN_ID, phone_id);
+            values.put(COLUMN_CLIENT_ID, client_id);
+            values.put(COLUMN_PHONE_NUMBER, "+380672363101");
+
+            id = db.insert(TABLE_NUMBERS_CUSTOMERS, null, values);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            ContentValues values = new ContentValues();
+            in_call_id = UUID.randomUUID().toString();
+            values.put(COLUMN_ID, in_call_id);
+            values.put(COLUMN_INCOMING_NUMBER, "+380672363101");
+            values.put(COLUMN_DURATION, 250);
+            values.put(COLUMN_CREATED_ACTION, (new Date()).getTime());
+
+
+            id = db.insert(TABLE_INCOMING_CALL, null, values);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            ContentValues values = new ContentValues();
+            category_id = UUID.randomUUID().toString();
+            values.put(COLUMN_ID, category_id);
+            values.put(COLUMN_NAME, "Первая категория");
+
+            id = db.insert(TABLE_CATEGORIES, null, values);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            ContentValues values = new ContentValues();
+            sub_category_id = UUID.randomUUID().toString();
+            values.put(COLUMN_ID, sub_category_id);
+            values.put(COLUMN_NAME, "Первая категория");
+            values.put(COLUMN_CATEGORY_ID, category_id);
+
+            id = db.insert(TABLE_SUB_CATEGORIES, null, values);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            ContentValues values = new ContentValues();
+            item_id = UUID.randomUUID().toString();
+            values.put(COLUMN_ID, item_id);
+            values.put(COLUMN_NAME, "Первый товар");
+            values.put(COLUMN_SUBCATEGORY_ID, sub_category_id);
+
+            id = db.insert(TABLE_ITEMS, null, values);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            ContentValues values = new ContentValues();
+            delivery_id = UUID.randomUUID().toString();
+            values.put(COLUMN_ID, delivery_id);
+            values.put(COLUMN_NAME, "Первый товар");
+
+            id = db.insert(TABLE_DELIVERY_ADDRESS, null, values);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            ContentValues values = new ContentValues();
+            order_id = UUID.randomUUID().toString();
+            values.put(COLUMN_ID, order_id);
+            values.put(COLUMN_CLIENT_ID, client_id);
+            values.put(COLUMN_TRANSPORT_ID, delivery_id);
+            values.put(COLUMN_CREATED_ACTION, (new Date()).getTime());
+
+            id = db.insert(TABLE_CUSTOMER_ORDERS, null, values);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            ContentValues values = new ContentValues();
+            order_det_id = UUID.randomUUID().toString();
+            values.put(COLUMN_ID, order_det_id);
+            values.put(COLUMN_ORDER_ID, order_id);
+            values.put(COLUMN_ITEM_ID, item_id);
+            values.put(COLUMN_CNT, 2);
+            values.put(COLUMN_SUMM, 150);
+
+            id = db.insert(TABLE_ORDERS_DETAILS, null, values);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
@@ -216,7 +365,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
             String strSQL = "Select t1." + COLUMN_CLIENT_ID +
                     " from " + TABLE_NUMBERS_CUSTOMERS + " t1" +
-                    " where " + COLUMN_PHONE_NUMBER + " = " + str_phone_number;
+                    " where " + COLUMN_PHONE_NUMBER + " = '" + str_phone_number + "'";
 
 
             cursor = db.rawQuery(strSQL, null);
@@ -241,27 +390,61 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return clientid;
     }
 
-    public String getClientInfo(String str_clientid){
-        String clientid = "";
+    public Client_Info getClientInfo(String str_clientid){
+
+        String client_surname = "";
+        String client_name = "";
+        String client_oldname = "";
+        String client_city = "";
+        String client_pet = "";
+        int client_cnt_orders = 0;
+        long client_first_order = 0;
+        long client_last_order = 0;
+        double client_sum_all = 0;
+        String client_comment = "";
+
+        Client_Info client = null;
+
         Cursor cursor = null;
         SQLiteDatabase db = getReadableDatabase();
 
         try {
 
-            String strSQL = "Select t1." + COLUMN_CLIENT_ID +
-                    " from " + TABLE_NUMBERS_CUSTOMERS + " t1" +
-                    " where " + COLUMN_PHONE_NUMBER + " = " + str_clientid;
-
+            String strSQL = "Select t1." + COLUMN_SURNAME +
+                    ", t1." + COLUMN_NAME +
+                    ", t1." + COLUMN_OLDNAME +
+                    ", t1." + COLUMN_CITY +
+                    ", t1." + COLUMN_PET +
+                    ", t1." + COLUMN_CNT_ORDERS +
+                    ", t1." + COLUMN_FIRST_ORDER +
+                    ", t1." + COLUMN_LAST_ORDER +
+                    ", t1." + COLUMN_SUM_ALL +
+                    ", t1." + COLUMN_COMMENT +
+                    " from " + TABLE_CUSTOMERS_STAT + " t1" +
+                    " where " + COLUMN_ID + " = '" + str_clientid + "'";
 
             cursor = db.rawQuery(strSQL, null);
 
             if (cursor.moveToFirst()) {
+
                 while (!cursor.isAfterLast()) {
 
-                    clientid = cursor.getString(cursor.getColumnIndex(COLUMN_CLIENT_ID));
+                    client_surname = cursor.getString(cursor.getColumnIndex(COLUMN_SURNAME));
+                    client_name = cursor.getString(cursor.getColumnIndex(COLUMN_NAME));
+                    client_oldname = cursor.getString(cursor.getColumnIndex(COLUMN_OLDNAME));
+                    client_city = cursor.getString(cursor.getColumnIndex(COLUMN_CITY));
+                    client_pet = cursor.getString(cursor.getColumnIndex(COLUMN_PET));
+                    client_cnt_orders = cursor.getInt(cursor.getColumnIndex(COLUMN_CNT_ORDERS));
+                    client_first_order = cursor.getLong(cursor.getColumnIndex(COLUMN_FIRST_ORDER));
+                    client_last_order = cursor.getLong(cursor.getColumnIndex(COLUMN_LAST_ORDER));
+                    client_sum_all = cursor.getDouble(cursor.getColumnIndex(COLUMN_SUM_ALL));
+                    client_comment = cursor.getString(cursor.getColumnIndex(COLUMN_COMMENT));
 
                     cursor.moveToNext();
                 }
+                client = new Client_Info(str_clientid,client_surname,client_name,client_oldname,client_city,client_pet,
+                        client_cnt_orders,client_first_order,client_last_order,client_sum_all,client_comment);
+
             }
 
         } catch (Exception e) {
@@ -271,9 +454,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 cursor.close();
             }
         }
-
-        return clientid;
+        return client;
     }
-
-
 }

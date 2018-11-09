@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -46,8 +47,8 @@ import static android.telecom.Call.STATE_SELECT_PHONE_ACCOUNT;
 public class CallActivity extends AppCompatActivity {
 
     private TextView mtextDisplayName;
-    private TextView mtextDuration;
-    private TextView mtextStatus;
+    //private TextView mtextDuration;
+    private TextView mtextStatus_Duration;
     private ImageView mbuttonChange;
 
     private Timer mTimer;
@@ -149,10 +150,10 @@ public class CallActivity extends AppCompatActivity {
         mbuttonChange.setVisibility(View.GONE);
 
         mtextDisplayName = findViewById(R.id.textDisplayName);
-        mtextDuration = findViewById(R.id.textDuration);
-        mtextStatus = findViewById(R.id.textStatus);
+        //mtextStatus_Duration = findViewById(R.id.textDuration);
+        mtextStatus_Duration = findViewById(R.id.textStatus);
+        //mtextStatus_Duration.setVisibility(View.INVISIBLE);
 
-        mtextDuration.setVisibility(View.INVISIBLE);
 /*
         Uri uri = call.getDetails().getHandle();
         String scheme = uri.getScheme();
@@ -171,6 +172,7 @@ public class CallActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d("MicroCRM", "CallActivity. onClick_green");
+                //v.setVisibility(View.INVISIBLE);
 
                 CallManager.INSTANCE.acceptCall(mСurrentCall);
             }
@@ -226,43 +228,6 @@ public class CallActivity extends AppCompatActivity {
         task.execute("show client", number);
         listtasks.add(task);
 
-        /*
-
-        if (mtask == null || mtask.getStatus() == AsyncTask.Status.FINISHED){
-            //Запустить AsyncTask
-            mtask = new Work_with_DB();
-        }
-
-        while (mtask.getStatus() == AsyncTask.Status.RUNNING) {
-            try {
-                TimeUnit.MILLISECONDS.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (mtask.getStatus() == AsyncTask.Status.PENDING) {
-
-*/
-
-
-        /*
-        DataBaseHelper helper;
-
-        helper = new DataBaseHelper(this);
-
-        String clientid = helper.getClientId(number);
-
-        if (clientid == ""){
-            // номер телефона не найден в базе номеров. проверим "контакты"
-            mtextDisplayName.setText(searchincontacts(number));
-
-        } else {
-            // достанем всю информацию о клиенте
-
-        }
-        */
-
     }
 
     private String SearchInContacts(String number) {
@@ -300,57 +265,63 @@ public class CallActivity extends AppCompatActivity {
 
         switch (call.getState()) {
             case STATE_ACTIVE: {
-                //mtextDisplayName.setText(searchincontacts());
                 show_info(call.getDetails().getHandle().getSchemeSpecificPart());
-                mtextStatus.setGravity(View.GONE);
-                mtextStatus.setText("");
-                mtextDuration.setVisibility(View.VISIBLE);
+                findViewById(R.id.buttonAnswer).setVisibility(View.INVISIBLE);
+                //mtextStatus.setGravity(View.GONE);
+                //mtextStatus.setText("");
+                //mtextDuration.setVisibility(View.VISIBLE);
             }
                 break;
             case STATE_CONNECTING:
-                mtextStatus.setGravity(View.VISIBLE);
-                mtextStatus.setText("Connecting…");
-                mtextDuration.setVisibility(View.INVISIBLE);
+                //mtextStatus_Duration.setGravity(View.VISIBLE);
+                mtextStatus_Duration.setText("Connecting…");
+                findViewById(R.id.buttonAnswer).setVisibility(View.INVISIBLE);
+                //mtextDuration.setVisibility(View.INVISIBLE);
                 break;
             case STATE_DIALING: {
                 //mtextDisplayName.setText(searchincontacts(call.getDetails().getHandle().getSchemeSpecificPart()));
                 show_info(call.getDetails().getHandle().getSchemeSpecificPart());
-                mtextStatus.setGravity(View.VISIBLE);
-                mtextStatus.setText("Calling…");
-                mtextDuration.setVisibility(View.INVISIBLE);
+                findViewById(R.id.buttonAnswer).setVisibility(View.INVISIBLE);
+                //mtextStatus_Duration.setGravity(View.VISIBLE);
+                mtextStatus_Duration.setText("Calling…");
+                //mtextDuration.setVisibility(View.INVISIBLE);
             }
             break;
             case STATE_RINGING: {
                 //mtextDisplayName.setText(searchincontacts(call.getDetails().getHandle().getSchemeSpecificPart()));
                 show_info(call.getDetails().getHandle().getSchemeSpecificPart());
-                mtextStatus.setGravity(View.VISIBLE);
-                mtextStatus.setText("Incoming call");
-                mtextDuration.setVisibility(View.INVISIBLE);
+                findViewById(R.id.buttonAnswer).setVisibility(View.VISIBLE);
+                //mtextStatus_Duration.setGravity(View.VISIBLE);
+                mtextStatus_Duration.setText("Incoming call");
+                //mtextDuration.setVisibility(View.INVISIBLE);
             }
                 break;
             case STATE_DISCONNECTED: {
-                mtextStatus.setGravity(View.VISIBLE);
-                mtextStatus.setText("Finished call");
-                mtextDuration.setVisibility(View.INVISIBLE);
+                //mtextStatus_Duration.setGravity(View.VISIBLE);
+                mtextStatus_Duration.setText("Finished call");
+                findViewById(R.id.buttonAnswer).setVisibility(View.INVISIBLE);
+                //mtextDuration.setVisibility(View.INVISIBLE);
                 CallManager.INSTANCE.getCurStatus(null);
             }
                 break;
             case STATE_DISCONNECTING:
-                mtextStatus.setGravity(View.VISIBLE);
-                mtextStatus.setText("Finishing call");
-                mtextDuration.setVisibility(View.INVISIBLE);
+                //mtextStatus_Duration.setGravity(View.VISIBLE);
+                mtextStatus_Duration.setText("Finishing call");
+                findViewById(R.id.buttonAnswer).setVisibility(View.INVISIBLE);
+                //mtextDuration.setVisibility(View.INVISIBLE);
                 break;
             case STATE_HOLDING:
-                mtextStatus.setGravity(View.VISIBLE);
-                mtextStatus.setText("");
-                mtextDuration.setVisibility(View.VISIBLE);
+                //mtextStatus_Duration.setGravity(View.VISIBLE);
+                mtextStatus_Duration.setText("");
+                //mtextDuration.setVisibility(View.VISIBLE);
                 break;
             case STATE_NEW:
-                mtextStatus.setGravity(View.VISIBLE);
-                mtextStatus.setText("");
-                mtextDuration.setVisibility(View.INVISIBLE);
+                //mtextStatus_Duration.setGravity(View.VISIBLE);
+                mtextStatus_Duration.setText("");
+                //mtextDuration.setVisibility(View.INVISIBLE);
                 break;
             case STATE_SELECT_PHONE_ACCOUNT:
+                findViewById(R.id.buttonAnswer).setVisibility(View.VISIBLE);
                 if (!mPendingShowDialog) {
 
                     TelecomManager tm = (TelecomManager) getSystemService(Context.TELECOM_SERVICE);
@@ -466,7 +437,7 @@ public class CallActivity extends AppCompatActivity {
 
                             call_duration = (call_duration - mСurrentCall.getDetails().getConnectTimeMillis()) / 1000;
 
-                            mtextDuration.setText(String.format("%02d:%02d:%02d", call_duration / 3600, (call_duration % 3600) / 60, (call_duration % 60)));
+                            mtextStatus_Duration.setText(String.format("%02d:%02d:%02d", call_duration / 3600, (call_duration % 3600) / 60, (call_duration % 60)));
                         }
                     }
                     else {
@@ -499,7 +470,19 @@ public class CallActivity extends AppCompatActivity {
                     } else {
                         //клиент - получить и показать инфу
                         ret_list.add("client");
-                        ret_list.add("It's our clients");
+                        Client_Info client = helper.getClientInfo(client_id);
+                        if(client != null) {
+
+                            ret_list.add(String.format("%s%s%s", client.client_surname != null ? String.format(" %s", client.client_surname) : String.format(""),
+                                    client.client_name != null ? String.format(" %s", client.client_name) : String.format(""),
+                                    client.client_oldname != null ? String.format(" %s", client.client_oldname) : String.format("")));
+
+                            ret_list.add(client.client_city != null ? String.format(" %s", client.client_city) : String.format(""));
+                            ret_list.add(client.client_pet != null ? String.format(" %s", client.client_pet) : String.format(""));
+
+                        } else {
+                            ret_list.add("It's our clients");
+                        }
                     }
                     break;
             }
@@ -514,20 +497,38 @@ public class CallActivity extends AppCompatActivity {
             switch (strings.get(0)) {
                 case "show client":
                     if (strings.get(1).equals("not_client")) {
+                        showForOther();
                         mtextDisplayName.setText(strings.get(2));
                     } else {
+                        showForClient();
                         mtextDisplayName.setText(strings.get(2));
+
+                        TextView textViewCity = findViewById(R.id.textViewCity);
+                        textViewCity.setText(strings.get(3));
+
+                        TextView textViewPet = findViewById(R.id.textViewPet);
+                        textViewPet.setText(strings.get(4));
                     }
                     break;
             }
-/*
-            for (int i = 0; i < strings.size(); i++ ) {
-                Toast.makeText(CallActivity.this, strings.get(i), Toast.LENGTH_LONG).show();
-            }
-*/
-
         }
+    }
+
+    private void showForClient(){
+        findViewById(R.id.imageBackground).setVisibility(View.INVISIBLE);
+        findViewById(R.id.textViewCity).setVisibility(View.VISIBLE);
+        findViewById(R.id.textViewPet).setVisibility(View.VISIBLE);
+
+        mtextDisplayName.setTextColor(Color.BLACK);
+        mtextStatus_Duration.setTextColor(Color.BLACK);
 
     }
 
+    private void showForOther(){
+        findViewById(R.id.imageBackground).setVisibility(View.VISIBLE);
+        mtextDisplayName.setTextColor(Color.WHITE);
+        mtextStatus_Duration.setTextColor(Color.WHITE);
+        findViewById(R.id.textViewCity).setVisibility(View.INVISIBLE);
+        findViewById(R.id.textViewPet).setVisibility(View.INVISIBLE);
+    }
 }

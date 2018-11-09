@@ -16,6 +16,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.Date;
+
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,6 +48,10 @@ public class MainActivity extends AppCompatActivity {
             //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, MAKE_CALL_PERMISSION_REQUEST_CODE);
 
         }
+
+        //new DataBaseHelper(this);
+
+        Date date = new Date();
 
     }
 

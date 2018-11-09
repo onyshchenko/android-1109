@@ -73,7 +73,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public String insert_student(Student student, String group_name, String group_uuid) {
         long id = 0;
         String str_uuid_group = "";
-        String str_uuid = UUID.randomUUID().toString();;
+        String str_uuid = UUID.randomUUID().toString();
         SQLiteDatabase db = getWritableDatabase();
 
         try {
