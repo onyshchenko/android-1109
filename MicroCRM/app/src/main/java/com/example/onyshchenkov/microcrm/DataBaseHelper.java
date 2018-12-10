@@ -178,7 +178,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_CATEGORIES);
         db.execSQL(CREATE_TABLE_DELIVERY_ADDRESS);
 
-        //init_db(db);
+        init_db(db);
     }
 
     private void init_db(SQLiteDatabase db){
@@ -199,8 +199,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             client_id = UUID.randomUUID().toString();
             values.put(COLUMN_ID, client_id);
-            values.put(COLUMN_SURNAME, "Иванов");
-            values.put(COLUMN_NAME, "Никита");
+            values.put(COLUMN_SURNAME, "Онищенко");
+            values.put(COLUMN_NAME, "Виталий");
             values.put(COLUMN_CITY, "Киев");
             values.put(COLUMN_CNT_ORDERS, 4);
             values.put(COLUMN_FIRST_ORDER, (new Date()).getTime()-(86400 * 5)); ////

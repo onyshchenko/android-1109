@@ -16,6 +16,7 @@ import android.telecom.Call;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -477,8 +478,14 @@ public class CallActivity extends AppCompatActivity {
                                     client.client_name != null ? String.format(" %s", client.client_name) : String.format(""),
                                     client.client_oldname != null ? String.format(" %s", client.client_oldname) : String.format("")));
 
-                            ret_list.add(client.client_city != null ? String.format(" %s", client.client_city) : String.format(""));
-                            ret_list.add(client.client_pet != null ? String.format(" %s", client.client_pet) : String.format(""));
+                            ret_list.add(client.client_city != null ? String.format("%s", client.client_city) : String.format(""));
+                            ret_list.add(client.client_pet != null ? String.format("%s", client.client_pet) : String.format(""));
+                            ret_list.add(String.valueOf(client.client_cnt_orders));
+                            ret_list.add(String.valueOf(client.client_sum_all));
+                            ret_list.add(String.valueOf(client.client_first_order));
+                            ret_list.add(String.valueOf(client.client_last_order));
+                            ret_list.add(client.client_comment);
+                            //ret_list.add(client.client_first_order != null ? String.format(" %s", client.client_pet) : String.format(""));
 
                         } else {
                             ret_list.add("It's our clients");
@@ -508,6 +515,18 @@ public class CallActivity extends AppCompatActivity {
 
                         TextView textViewPet = findViewById(R.id.textViewPet);
                         textViewPet.setText(strings.get(4));
+
+
+//Toast example
+                        String call_act_orders_summ = getString(R.string.call_act_orders_summ, strings.get(5), strings.get(6));
+                        TextView textViewFreqOrdes = findViewById(R.id.textViewFreqOrdes);
+                        textViewFreqOrdes.setText(Html.fromHtml(call_act_orders_summ));
+                        //tv.setText(Html.fromHtml(myColorText));
+
+
+                        TextView textViewComment = findViewById(R.id.textViewComment);
+                        textViewComment.setText(strings.get(9));
+
                     }
                     break;
             }
@@ -518,6 +537,9 @@ public class CallActivity extends AppCompatActivity {
         findViewById(R.id.imageBackground).setVisibility(View.INVISIBLE);
         findViewById(R.id.textViewCity).setVisibility(View.VISIBLE);
         findViewById(R.id.textViewPet).setVisibility(View.VISIBLE);
+        findViewById(R.id.textViewFreqOrdes).setVisibility(View.VISIBLE);
+        findViewById(R.id.textViewComment).setVisibility(View.VISIBLE);
+        findViewById(R.id.textViewLastOrders).setVisibility(View.VISIBLE);
 
         mtextDisplayName.setTextColor(Color.BLACK);
         mtextStatus_Duration.setTextColor(Color.BLACK);
@@ -526,9 +548,13 @@ public class CallActivity extends AppCompatActivity {
 
     private void showForOther(){
         findViewById(R.id.imageBackground).setVisibility(View.VISIBLE);
-        mtextDisplayName.setTextColor(Color.WHITE);
-        mtextStatus_Duration.setTextColor(Color.WHITE);
         findViewById(R.id.textViewCity).setVisibility(View.INVISIBLE);
         findViewById(R.id.textViewPet).setVisibility(View.INVISIBLE);
+        findViewById(R.id.textViewFreqOrdes).setVisibility(View.INVISIBLE);
+        findViewById(R.id.textViewComment).setVisibility(View.INVISIBLE);
+        findViewById(R.id.textViewLastOrders).setVisibility(View.INVISIBLE);
+
+        mtextDisplayName.setTextColor(Color.WHITE);
+        mtextStatus_Duration.setTextColor(Color.WHITE);
     }
 }

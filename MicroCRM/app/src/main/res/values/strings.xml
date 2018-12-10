@@ -4,4 +4,7 @@
     <string name="action_setting">Настройки</string>
     <string name="action_find">Поиск по номеру</string>
     <string name="action_get_from_server">Загрузить</string>
+    <string name="call_act_orders_summ"><![CDATA[Заказов <b>%1$s</b> на сумму <b>%2$s</b> грн.]]></string>
+    <string name="call_act_orders_freq">Заказы каждые <b>%1$s</b> дней</string>
+    <string name="call_act_orders_last">Последний заказ <b>%1$s</b> дней назад</string>
 </resources>
